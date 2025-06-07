@@ -1,0 +1,44 @@
+### Test PDF Upload
+POST http://localhost:8888/upload
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="file"; filename="test.pdf"
+Content-Type: application/pdf
+
+< ./test-files/test.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+### Get all custom patterns
+GET http://localhost:5000/api/patterns
+
+### Add a custom pattern without validation
+POST http://localhost:5000/api/patterns
+Content-Type: application/json
+
+{
+  "name": "CustomID",
+  "pattern": "ID-\\d{6}",
+  "requiresValidation": false
+}
+
+### Add a custom pattern with validation
+POST http://localhost:5000/api/patterns
+Content-Type: application/json
+
+{
+  "name": "CustomPhoneNumber",
+  "pattern": "TEL-\\d{10}",
+  "requiresValidation": true
+}
+
+### Check text with custom patterns
+POST http://localhost:5000/api/check-text
+Content-Type: application/json
+
+{
+  "text": "This is a test with ID-123456 and TEL-9876543210 patterns."
+}
+
+### Delete a pattern by index
+DELETE http://localhost:5000/api/patterns/0

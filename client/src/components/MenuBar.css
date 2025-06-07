@@ -1,0 +1,253 @@
+.side-menu {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #ffffff;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.side-menu.dark {
+  background-color: #1a1a1a;
+  border-right-color: #333;
+}
+
+.menu-logo {
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  border-bottom: 1px solid #ddd;
+  margin-top: 10px;
+}
+
+.dark .menu-logo {
+  color: #fff;
+  border-bottom-color: #333;
+}
+
+.menu-buttons {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menu-button {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  text-align: left;
+}
+
+.dark .menu-button {
+  color: #fff;
+}
+
+.menu-button:hover {
+  background-color: #f0f0f0;
+}
+
+.dark .menu-button:hover {
+  background-color: #2d2d2d;
+}
+
+.menu-button i {
+  width: 20px;
+  text-align: center;
+}
+
+.menu-footer {
+  margin-top: auto;
+  padding: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+.dark .menu-footer {
+  border-top-color: #333;
+}
+
+.theme-toggle {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  color: #333;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.dark .theme-toggle {
+  color: #fff;
+}
+
+.theme-toggle:hover {
+  background-color: #f0f0f0;
+}
+
+.dark .theme-toggle:hover {
+  background-color: #2d2d2d;
+}
+
+/* Burger Menu Button */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1001;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 10px;
+  transition: all 0.3s ease;
+}
+
+.burger-icon {
+  position: relative;
+  width: 24px;
+  height: 18px;
+}
+
+.burger-icon span {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: var(--text-primary);
+  border-radius: 3px;
+  transition: all 0.3s ease;
+}
+
+.burger-icon span:first-child {
+  top: 0;
+}
+
+.burger-icon span:nth-child(2) {
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.burger-icon span:last-child {
+  bottom: 0;
+}
+
+/* Animated burger icon when menu is open */
+.menu-toggle.open .burger-icon span:first-child {
+  transform: rotate(45deg);
+  top: 50%;
+}
+
+.menu-toggle.open .burger-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle.open .burger-icon span:last-child {
+  transform: rotate(-45deg);
+  bottom: 40%;
+}
+
+/* Overlay for mobile menu */
+.menu-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.menu-overlay.show {
+  opacity: 1;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .side-menu {
+    transform: translateX(-100%);
+    width: 80%;
+    max-width: 300px;
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .menu-logo {
+    padding: 1.25rem;
+    margin-top: 0;
+  }
+
+  .menu-toggle {
+    display: block;
+  }
+
+  .side-menu.open {
+    transform: translateX(0);
+  }
+
+  .menu-overlay {
+    display: block;
+  }
+}
+
+/* Dark mode styles */
+.dark .burger-icon span {
+  background-color: #fff;
+}
+
+.dark .menu-toggle:hover .burger-icon span {
+  background-color: #90caf9;
+} 
+
+.logout-button {
+  width: 100%;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 8px;
+  background-color: transparent;
+  color: #dc3545;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+  transition: all 0.2s;
+}
+
+.dark .logout-button {
+  color: #ff6b6b;
+}
+
+.logout-button:hover {
+  background-color: #ffebee;
+}
+
+.dark .logout-button:hover {
+  background-color: rgba(255, 107, 107, 0.1);
+}
+
+.logout-button i {
+  width: 20px;
+  text-align: center;
+} 

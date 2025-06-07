@@ -1,0 +1,370 @@
+/* Base styling for the login page */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  width: 100%;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  overflow-x: hidden;
+  padding: 20px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+/* Dark theme - which is the default for this design */
+.login-container.dark {
+  background-color: #0A1626;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+                    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(20, 40, 80, 0.2) 2px, rgba(20, 40, 80, 0.2) 4px);
+  color: #fff;
+}
+
+/* This creates a radial glow effect behind the shield */
+.login-container.dark::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(76, 214, 255, 0.08) 0%,
+    rgba(76, 214, 255, 0.03) 30%,
+    transparent 70%
+  );
+  z-index: 0;
+  pointer-events: none;
+}
+
+.login-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 440px;
+  padding: 20px;
+  text-align: center;
+  position: relative;
+  z-index: 1;
+}
+
+/* Main title styling */
+.app-title {
+  font-size: 64px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  color: #4CD6FF;
+  text-shadow: 0 0 12px rgba(76, 214, 255, 0.6);
+  letter-spacing: 2px;
+}
+
+/* Login subtitle */
+.login-subtitle {
+  font-size: 36px;
+  letter-spacing: 10px;
+  margin-bottom: 40px;
+  color: #4CD6FF;
+  opacity: 0.9;
+}
+
+/* Shield icon container */
+.shield-icon {
+  margin: 10px 0 30px;
+  animation: pulse 3s infinite ease-in-out;
+  width: 100%;
+  max-width: 240px;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  position: relative;
+}
+
+/* Enhanced glow effect behind the shield */
+.shield-icon::before {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background: radial-gradient(
+    circle at center,
+    rgba(76, 214, 255, 0.25) 0%,
+    rgba(76, 214, 255, 0.1) 40%,
+    rgba(76, 214, 255, 0.03) 70%,
+    transparent 80%
+  );
+  filter: blur(15px);
+  z-index: -1;
+  transform: scale(1.4);
+  opacity: 0.6;
+  animation: glowPulse 4s infinite alternate ease-in-out;
+}
+
+@keyframes glowPulse {
+  0% {
+    opacity: 0.4;
+    transform: scale(1.2);
+  }
+  100% {
+    opacity: 0.6;
+    transform: scale(1.5);
+  }
+}
+
+.shield-icon svg {
+  width: 100%;
+  height: auto;
+  max-width: 240px;
+  position: relative;
+  z-index: 2;
+}
+
+/* Create a pulsing animation for the shield */
+@keyframes pulse {
+  0% { filter: drop-shadow(0 0 6px rgba(76, 214, 255, 0.4)); }
+  50% { filter: drop-shadow(0 0 12px rgba(76, 214, 255, 0.7)); }
+  100% { filter: drop-shadow(0 0 6px rgba(76, 214, 255, 0.4)); }
+}
+
+/* Slogan text */
+.app-slogan {
+  font-size: 28px;
+  color: #4CD6FF;
+  margin-bottom: 40px;
+  font-weight: 300;
+  width: 100%;
+  max-width: 500px;
+  text-shadow: 0 0 8px rgba(76, 214, 255, 0.4);
+}
+
+/* Google sign-in button */
+.google-sign-in-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+  padding: 12px 20px;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.google-sign-in-btn:hover {
+  background-color: rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+}
+
+.google-sign-in-btn:active {
+  transform: translateY(1px);
+}
+
+.google-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin-right: 12px;
+  background-color: white;
+  border-radius: 50%;
+  padding: 3px;
+  flex-shrink: 0;
+}
+
+.google-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.btn-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Loading spinner */
+.loading-spinner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.spinner {
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top: 3px solid #4CD6FF;
+  width: 24px;
+  height: 24px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 10px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error message styling */
+.error-message {
+  color: #ff6b6b;
+  background-color: rgba(255, 107, 107, 0.1);
+  padding: 10px;
+  border-radius: 4px;
+  margin-top: 15px;
+  font-size: 14px;
+  text-align: center;
+  max-width: 320px;
+  width: 100%;
+}
+
+/* Responsive styles for different screen sizes */
+@media screen and (max-width: 768px) {
+  .app-title {
+    font-size: 48px;
+  }
+  
+  .login-subtitle {
+    font-size: 28px;
+    letter-spacing: 8px;
+  }
+  
+  .shield-icon svg {
+    max-width: 200px;
+  }
+  
+  .app-slogan {
+    font-size: 22px;
+    margin-bottom: 30px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .login-container {
+    padding: 15px;
+  }
+
+  .app-title {
+    font-size: 36px;
+    margin-bottom: 5px;
+  }
+  
+  .login-subtitle {
+    font-size: 20px;
+    letter-spacing: 6px;
+    margin-bottom: 20px;
+  }
+  
+  .shield-icon svg {
+    max-width: 160px;
+  }
+  
+  .shield-icon::before {
+    transform: scale(1.3);
+  }
+  
+  @keyframes glowPulse {
+    0% {
+      opacity: 0.4;
+      transform: scale(1.1);
+    }
+    100% {
+      opacity: 0.6;
+      transform: scale(1.3);
+    }
+  }
+  
+  .app-slogan {
+    font-size: 18px;
+    margin-bottom: 25px;
+  }
+  
+  .google-sign-in-btn {
+    max-width: 280px;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+  
+  .login-content {
+    padding: 10px;
+  }
+}
+
+/* For very small screens */
+@media screen and (max-width: 320px) {
+  .login-container {
+    padding: 10px;
+  }
+
+  .app-title {
+    font-size: 30px;
+  }
+  
+  .login-subtitle {
+    font-size: 16px;
+    letter-spacing: 4px;
+    margin-bottom: 15px;
+  }
+  
+  .shield-icon svg {
+    max-width: 140px;
+  }
+  
+  .app-slogan {
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
+  
+  .google-sign-in-btn {
+    max-width: 240px;
+    padding: 8px 14px;
+    font-size: 14px;
+  }
+
+  .google-icon {
+    width: 20px;
+    height: 20px;
+    padding: 2px;
+    margin-right: 8px;
+  }
+}
+
+/* For orientation changes and landscape mode on small devices */
+@media screen and (max-height: 500px) and (orientation: landscape) {
+  .app-title {
+    font-size: 36px;
+    margin-bottom: 5px;
+  }
+  
+  .login-subtitle {
+    font-size: 20px;
+    margin-bottom: 15px;
+  }
+  
+  .shield-icon {
+    margin: 5px 0 15px;
+  }
+  
+  .shield-icon svg {
+    max-width: 120px;
+  }
+  
+  .app-slogan {
+    font-size: 18px;
+    margin-bottom: 15px;
+  }
+} 

@@ -1,0 +1,59 @@
+const express = require('express');
+const router = express.Router();
+const patternController = require('../controllers/patternController');
+const documentController = require('../controllers/documentController');
+const multer = require('multer');
+const fs = require('fs');
+const authMiddleware = require('../middleware/authMiddleware');
+
+// Document processing routes (with optional auth)
+// The middleware will attach the user to req if authenticated, but allow guests to proceed
+const optionalAuth = (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    console.log('[optionalAuth] No auth token, proceeding as guest');
+    return next();
+  }
+  
+  // If there is an auth header, try to authenticate
+  authMiddleware(req, res, (err) => {
+    if (err) {
+      // If authentication fails, still proceed as guest
+      console.log('[optionalAuth] Auth failed, proceeding as guest');
+      return next();
+    }
+    console.log('[optionalAuth] User authenticated:', req.user._id);
+    next();
+  });
+};
+
+// Multer configuration
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const uploadDir = 'uploads/';
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir);
+      }
+      cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+      const uniqueName = Date.now() + '-' + file.originalname;
+      cb(null, uniqueName);
+    },
+  }),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+});
+
+// Pattern routes (with optional auth)
+router.get('/patterns', optionalAuth, patternController.getPatterns);
+router.post('/patterns', optionalAuth, patternController.addPattern);
+router.delete('/patterns/:index', optionalAuth, patternController.deletePattern);
+
+// Apply optional auth to document routes
+router.post('/check-text', optionalAuth, documentController.checkText);
+router.post('/upload-file', optionalAuth, upload.single('file'), documentController.processFile);
+router.get('/view/:filename', documentController.viewFile);
+router.get('/download/:filename', documentController.downloadFile);
+
+module.exports = router;
