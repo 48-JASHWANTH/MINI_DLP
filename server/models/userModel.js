@@ -21,6 +21,14 @@ const UserSchema = new mongoose.Schema({
     type: String,
     default: ""
   },
+  dateOfBirth: {
+    type: String,
+    default: ""
+  },
+  address: {
+    type: String,
+    default: ""
+  },
   role: {
     type: String,
     default: "user"
@@ -43,6 +51,16 @@ const UserSchema = new mongoose.Schema({
       default: Date.now
     }
   }],
+  folders: [{
+    name: {
+      type: String,
+      required: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }],
   createdAt: {
     type: Date,
     default: Date.now
@@ -56,7 +74,12 @@ const UserSchema = new mongoose.Schema({
       default: Date.now
     },
     fileSize: Number,
-    fileType: String
+    fileType: String,
+    folderId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Folder',
+      default: null
+    }
   }]
 }, { timestamps: true });
 

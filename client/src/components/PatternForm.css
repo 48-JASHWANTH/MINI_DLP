@@ -186,32 +186,33 @@
 }
 
 .pattern-form-card {
-  background-color: #fff;
+  background-color: #0a0a0a;
   border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   padding: 1.5rem;
   margin-bottom: 1.5rem;
+  color: #fff;
 }
 
 .pattern-form-card.dark {
-  background-color: #2d2d2d;
+  background-color: #0a0a0a;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  color: #e0e0e0;
+  color: #fff;
 }
 
 .card-title {
   margin-top: 0;
   margin-bottom: 1.5rem;
-  color: #333;
+  color: #00e1ff;
   font-size: 1.5rem;
   font-weight: 600;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #1a1a1a;
   padding-bottom: 0.75rem;
 }
 
 .pattern-form-card.dark .card-title {
-  color: #e0e0e0;
-  border-bottom-color: #444;
+  color: #00e1ff;
+  border-bottom-color: #1a1a1a;
 }
 
 .form-group {
@@ -222,38 +223,39 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #555;
+  color: #fff;
 }
 
 .pattern-form-card.dark .form-group label {
-  color: #ccc;
+  color: #fff;
 }
 
 .form-group input[type="text"] {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #ddd;
+  border: 1px solid #00e1ff;
   border-radius: 4px;
   font-size: 1rem;
-  background-color: #fff;
+  background-color: rgba(0, 0, 0, 0.2);
   transition: border-color 0.2s, box-shadow 0.2s;
+  color: #fff;
 }
 
 .pattern-form-card.dark .form-group input[type="text"] {
-  background-color: #3a3a3a;
-  border-color: #555;
-  color: #e0e0e0;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: #00e1ff;
+  color: #fff;
 }
 
 .form-group input[type="text"]:focus {
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.15);
+  border-color: #00e1ff;
+  box-shadow: 0 0 0 3px rgba(0, 225, 255, 0.2);
   outline: none;
 }
 
 .pattern-form-card.dark .form-group input[type="text"]:focus {
-  border-color: #4a90e2;
-  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.3);
+  border-color: #00e1ff;
+  box-shadow: 0 0 0 3px rgba(0, 225, 255, 0.2);
 }
 
 .btn {
@@ -271,65 +273,79 @@
 }
 
 .btn-primary {
-  background-color: #4a90e2;
-  color: white;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #00e1ff;
+  border: 1px solid #00e1ff;
 }
 
 .btn-primary:hover {
-  background-color: #3a80d2;
+  background-color: rgba(0, 225, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 225, 255, 0.4);
 }
 
 .btn-primary:disabled {
-  background-color: #a0c3eb;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 225, 255, 0.5);
+  color: rgba(0, 225, 255, 0.5);
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .pattern-form-card.dark .btn-primary {
-  background-color: #3a80d2;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #00e1ff;
+  border: 1px solid #00e1ff;
 }
 
 .pattern-form-card.dark .btn-primary:hover {
-  background-color: #2a70c2;
+  background-color: rgba(0, 225, 255, 0.1);
+  box-shadow: 0 0 10px rgba(0, 225, 255, 0.4);
 }
 
 .pattern-form-card.dark .btn-primary:disabled {
-  background-color: #556d8c;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-color: rgba(0, 225, 255, 0.5);
+  color: rgba(0, 225, 255, 0.5);
 }
 
 .error-message {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: rgba(255, 87, 87, 0.2);
+  color: #ff5757;
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  border-left: 3px solid #ff5757;
 }
 
 .success-message {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: rgba(56, 161, 105, 0.2);
+  color: #68d391;
   padding: 0.75rem;
   border-radius: 4px;
   margin-bottom: 1rem;
+  border-left: 3px solid #68d391;
 }
 
 .pattern-form-card.dark .error-message {
-  background-color: rgba(220, 53, 69, 0.15);
-  color: #fc8181;
+  background-color: rgba(255, 87, 87, 0.2);
+  color: #ff5757;
+  border-left: 3px solid #ff5757;
 }
 
 .pattern-form-card.dark .success-message {
-  background-color: rgba(40, 167, 69, 0.15);
+  background-color: rgba(56, 161, 105, 0.2);
   color: #68d391;
+  border-left: 3px solid #68d391;
 }
 
 .hint {
   margin-top: 0.25rem;
   font-size: 0.85rem;
-  color: #777;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .pattern-form-card.dark .hint {
-  color: #9e9e9e;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .checkbox-group {

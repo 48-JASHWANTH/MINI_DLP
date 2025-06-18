@@ -4,17 +4,12 @@
   position: fixed;
   left: 0;
   top: 0;
-  background-color: #ffffff;
-  border-right: 1px solid #ddd;
+  background-color: #0a0a0a;
+  border-right: 1px solid #1a1a1a;
   display: flex;
   flex-direction: column;
   transition: all 0.3s ease;
   z-index: 1000;
-}
-
-.side-menu.dark {
-  background-color: #1a1a1a;
-  border-right-color: #333;
 }
 
 .menu-logo {
@@ -22,22 +17,18 @@
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 1.25rem;
+  font-size: 1.75rem;
   font-weight: bold;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #1a1a1a;
   margin-top: 10px;
-}
-
-.dark .menu-logo {
-  color: #fff;
-  border-bottom-color: #333;
+  color: #00e1ff;
 }
 
 .menu-buttons {
   padding: 1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .menu-button {
@@ -48,23 +39,16 @@
   border: none;
   border-radius: 8px;
   background-color: transparent;
-  color: #333;
+  color: #00e1ff;
   cursor: pointer;
   transition: all 0.2s;
   width: 100%;
   text-align: left;
-}
-
-.dark .menu-button {
-  color: #fff;
+  font-size: 1.1rem;
 }
 
 .menu-button:hover {
-  background-color: #f0f0f0;
-}
-
-.dark .menu-button:hover {
-  background-color: #2d2d2d;
+  background-color: #1a1a1a;
 }
 
 .menu-button i {
@@ -75,36 +59,7 @@
 .menu-footer {
   margin-top: auto;
   padding: 1rem;
-  border-top: 1px solid #ddd;
-}
-
-.dark .menu-footer {
-  border-top-color: #333;
-}
-
-.theme-toggle {
-  width: 100%;
-  padding: 0.75rem;
-  border: none;
-  border-radius: 8px;
-  background-color: transparent;
-  color: #333;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.dark .theme-toggle {
-  color: #fff;
-}
-
-.theme-toggle:hover {
-  background-color: #f0f0f0;
-}
-
-.dark .theme-toggle:hover {
-  background-color: #2d2d2d;
+  border-top: 1px solid #1a1a1a;
 }
 
 /* Burger Menu Button */
@@ -131,7 +86,7 @@
   position: absolute;
   width: 100%;
   height: 2px;
-  background-color: var(--text-primary);
+  background-color: #00e1ff;
   border-radius: 3px;
   transition: all 0.3s ease;
 }
@@ -211,13 +166,8 @@
   }
 }
 
-/* Dark mode styles */
-.dark .burger-icon span {
-  background-color: #fff;
-}
-
-.dark .menu-toggle:hover .burger-icon span {
-  background-color: #90caf9;
+.menu-toggle:hover .burger-icon span {
+  background-color: #00e1ff;
 } 
 
 .logout-button {
@@ -226,7 +176,7 @@
   border: none;
   border-radius: 8px;
   background-color: transparent;
-  color: #dc3545;
+  color: #00e1ff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -235,16 +185,8 @@
   transition: all 0.2s;
 }
 
-.dark .logout-button {
-  color: #ff6b6b;
-}
-
 .logout-button:hover {
-  background-color: #ffebee;
-}
-
-.dark .logout-button:hover {
-  background-color: rgba(255, 107, 107, 0.1);
+  background-color: rgba(0, 225, 255, 0.1);
 }
 
 .logout-button i {

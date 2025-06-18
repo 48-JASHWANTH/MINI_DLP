@@ -76,6 +76,12 @@ exports.processFile = async (req, res) => {
     console.log('[processFile] Processing file:', req.file.originalname);
     console.log('[processFile] User authenticated:', !!req.user);
     
+    // Check if a folder ID was provided
+    const folderId = req.body.folderId || null;
+    if (folderId) {
+      console.log('[processFile] File will be assigned to folder:', folderId);
+    }
+    
     const filePath = path.resolve(req.file.path);
     const fileExtension = path.extname(req.file.originalname).toLowerCase();
     let text;
@@ -179,6 +185,19 @@ exports.processFile = async (req, res) => {
       const UserModel = require('../models/userModel');
       const fileSize = Buffer.byteLength(highlightedPdf) + Buffer.byteLength(maskedPdf);
       
+      // Validate folderId if provided
+      if (folderId) {
+        // Check if folder exists for this user
+        const user = await UserModel.findById(req.user._id);
+        const folderExists = user.folders.some(folder => 
+          folder._id.toString() === folderId
+        );
+        
+        if (!folderExists) {
+          console.log('[processFile] Warning: Provided folder ID does not exist for this user. File will not be associated with a folder.');
+        }
+      }
+      
       // Add files to user's processedFiles
       await UserModel.findByIdAndUpdate(req.user._id, {
         $push: {
@@ -188,7 +207,8 @@ exports.processFile = async (req, res) => {
             maskedVersion: maskedFile,
             processedAt: new Date(),
             fileSize: fileSize,
-            fileType: fileExtension
+            fileType: fileExtension,
+            folderId: folderId || null
           }
         }
       });

@@ -37,6 +37,19 @@ export const deleteUserFile = (token, fileId) => userApi.delete(`/files/${fileId
   headers: { Authorization: `Bearer ${token}` }
 });
 
+export const saveProcessedFiles = (token, fileData) => userApi.post('/files/save', fileData, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
+// User folders endpoints
+export const getUserFolders = (token) => userApi.get('/folders', {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
+export const createUserFolder = (token, folderData) => userApi.post('/folders', folderData, {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
 // User patterns endpoints
 export const getUserPatterns = (token) => patternApi.get('/', {
   headers: { Authorization: `Bearer ${token}` }

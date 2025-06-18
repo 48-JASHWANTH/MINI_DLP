@@ -23,7 +23,7 @@ exports.getUserProfile = async (req, res) => {
 exports.updateUserProfile = async (req, res) => {
   try {
     const userId = req.user._id;
-    const { name, phoneNumber, organization } = req.body;
+    const { name, phoneNumber, organization, dateOfBirth, address } = req.body;
     
     // Find user and update profile
     const updatedUser = await UserModel.findByIdAndUpdate(
@@ -33,6 +33,8 @@ exports.updateUserProfile = async (req, res) => {
           name: name || undefined,
           phoneNumber: phoneNumber || undefined,
           organization: organization || undefined,
+          dateOfBirth: dateOfBirth || undefined,
+          address: address || undefined,
         }
       },
       { new: true, runValidators: true }

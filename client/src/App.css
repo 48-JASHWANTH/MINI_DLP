@@ -4,18 +4,18 @@
   --text-primary: #333333;
   --text-secondary: #666666;
   --border-color: #ddd;
-  --accent-color: #007bff;
-  --accent-hover: #0056b3;
+  --accent-color: #00e1ff;
+  --accent-hover: #00b8cc;
 }
 
 .dark {
-  --bg-primary: #1a1a1a;
-  --bg-secondary: #2d2d2d;
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #121212;
   --text-primary: #ffffff;
   --text-secondary: #cccccc;
   --border-color: #333;
-  --accent-color: #0d6efd;
-  --accent-hover: #0b5ed7;
+  --accent-color: #00e1ff;
+  --accent-hover: #00b8cc;
 }
 
 body {

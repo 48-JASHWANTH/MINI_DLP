@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { addUserPattern } from '../api';
 import './PatternForm.css';
 
-function PatternForm({ isDarkMode, onPatternAdded }) {
+function PatternForm({ onPatternAdded }) {
   const [name, setName] = useState('');
   const [pattern, setPattern] = useState('');
   const [requiresValidation, setRequiresValidation] = useState(false);
@@ -46,15 +46,17 @@ function PatternForm({ isDarkMode, onPatternAdded }) {
   };
 
   return (
-    <div className={`pattern-form-card ${isDarkMode ? 'dark' : ''}`}>
-      <h2 className="card-title">Add New Pattern</h2>
+    <div className="pattern-form-card">
+      <h2 className="card-title">
+        <i className="fas fa-plus-circle"></i> Add New Pattern
+      </h2>
       
-      {error && <div className="error-message">{error}</div>}
-      {success && <div className="success-message">{success}</div>}
+      {error && <div className="error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
+      {success && <div className="success-message"><i className="fas fa-check-circle"></i> {success}</div>}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
-          <label>Pattern Name:</label>
+          <label><i className="fas fa-tag"></i> Pattern Name:</label>
           <input 
             type="text" 
             value={name} 
@@ -66,7 +68,7 @@ function PatternForm({ isDarkMode, onPatternAdded }) {
         </div>
         
         <div className="form-group">
-          <label>Regex Pattern:</label>
+          <label><i className="fas fa-code"></i> Regex Pattern:</label>
           <input 
             type="text" 
             value={pattern} 
@@ -75,7 +77,7 @@ function PatternForm({ isDarkMode, onPatternAdded }) {
             disabled={loading}
             placeholder="e.g., \d{4}-\d{4}-\d{4}-\d{4}"
           />
-          <p className="hint">Use regular expressions to define your pattern</p>
+          <p className="hint"><i className="fas fa-info-circle"></i> Use regular expressions to define your pattern</p>
         </div>
         
         <div className="form-group checkbox-group">
@@ -86,9 +88,9 @@ function PatternForm({ isDarkMode, onPatternAdded }) {
               onChange={(e) => setRequiresValidation(e.target.checked)} 
               disabled={loading}
             />
-            Requires Validation
+            <i className="fas fa-check-square"></i> Requires Validation
           </label>
-          <p className="hint">Enable to apply validation checks for this pattern type</p>
+          <p className="hint"><i className="fas fa-info-circle"></i> Enable to apply validation checks for this pattern type</p>
         </div>
         
         <button 
@@ -96,7 +98,7 @@ function PatternForm({ isDarkMode, onPatternAdded }) {
           className="btn btn-primary" 
           disabled={loading}
         >
-          {loading ? 'Saving...' : 'Save Pattern'}
+          {loading ? <><i className="fas fa-spinner fa-spin"></i> Saving...</> : <><i className="fas fa-save"></i> Save Pattern</>}
         </button>
       </form>
     </div>

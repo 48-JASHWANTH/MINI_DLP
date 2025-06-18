@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getUserPatterns, deleteUserPattern } from '../api';
 import './PatternList.css';
 
-function PatternList({ isDarkMode, refreshTrigger }) {
+function PatternList({ refreshTrigger }) {
   const [customPatterns, setCustomPatterns] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -66,49 +66,49 @@ function PatternList({ isDarkMode, refreshTrigger }) {
 
   if (loading && !customPatterns.length) {
     return (
-      <div className={`pattern-list-container ${isDarkMode ? 'dark' : ''}`}>
+      <div className="pattern-list-container">
         <div className="loading-spinner">
           <div className="spinner"></div>
-          <p>Loading patterns...</p>
+          <p><i className="fas fa-spinner fa-spin"></i> Loading patterns...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={`pattern-list-container ${isDarkMode ? 'dark' : ''}`}>
-      {error && <div className="error-message">{error}</div>}
+    <div className="pattern-list-container">
+      {error && <div className="error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
       
-      <h2 className="section-title">Your Custom Patterns</h2>
+      <h2 className="section-title"><i className="fas fa-list"></i> Your Custom Patterns</h2>
       <div className="pattern-list">
         {customPatterns.length > 0 ? (
           customPatterns.map((pattern) => (
             <div key={pattern._id} className="pattern-item custom-pattern">
               <div className="pattern-info">
-                <h3>{pattern.name}</h3>
-                <p className="pattern-text">{pattern.pattern}</p>
+                <h3><i className="fas fa-fingerprint"></i> {pattern.name}</h3>
+                <p className="pattern-text"><i className="fas fa-code"></i> {pattern.pattern}</p>
                 <div className="pattern-meta">
-                  <span className="pattern-badge custom">Custom</span>
+                  <span className="pattern-badge custom"><i className="fas fa-user-edit"></i> Custom</span>
                   {pattern.requiresValidation && 
-                    <span className="pattern-badge validation">Validation Enabled</span>
+                    <span className="pattern-badge validation"><i className="fas fa-shield-alt"></i> Validation Enabled</span>
                   }
                 </div>
               </div>
               <div className="pattern-actions">
                 {deleteConfirm === pattern._id ? (
                   <div className="confirm-delete">
-                    <span>Confirm delete?</span>
+                    <span><i className="fas fa-question-circle"></i> Confirm delete?</span>
                     <button 
                       onClick={() => handleDelete(pattern._id)}
                       className="btn btn-confirm-delete"
                     >
-                      Yes
+                      <i className="fas fa-check"></i> Yes
                     </button>
                     <button 
                       onClick={cancelDelete}
                       className="btn btn-cancel-delete"
                     >
-                      No
+                      <i className="fas fa-times"></i> No
                     </button>
                   </div>
                 ) : (
@@ -124,7 +124,7 @@ function PatternList({ isDarkMode, refreshTrigger }) {
             </div>
           ))
         ) : (
-          <p className="no-patterns">You haven't created any custom patterns yet.</p>
+          <p className="no-patterns"><i className="fas fa-info-circle"></i> You haven't created any custom patterns yet.</p>
         )}
       </div>
     </div>

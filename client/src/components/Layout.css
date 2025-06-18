@@ -8,18 +8,30 @@
 }
 
 .app.dark {
-  background-color: #1a1a1a;
+  background-color: #0a0a0a;
   color: #ffffff;
 }
 
 .main-content {
   flex: 1;
   padding: 20px;
-  margin-top: 60px; /* Adjust based on your MenuBar height */
+  margin-left: 250px;
 }
 
 .content-wrapper {
   max-width: 1200px;
-  margin: 0 auto;
   padding: 20px;
-} 
+  width: 100%;
+}
+
+.pattern-management {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0;
+  }
+}

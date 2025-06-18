@@ -1,3 +1,6 @@
+/* Import Google's Roboto font for the sign-in button */
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500&display=swap');
+
 /* Base styling for the login page */
 .login-container {
   display: flex;
@@ -16,9 +19,28 @@
 /* Dark theme - which is the default for this design */
 .login-container.dark {
   background-color: #0A1626;
-  background-image: linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
-                    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(20, 40, 80, 0.2) 2px, rgba(20, 40, 80, 0.2) 4px);
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.85), rgba(0, 0, 0, 0.85)), 
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(20, 40, 80, 0.2) 2px, rgba(20, 40, 80, 0.2) 4px);
   color: #fff;
+}
+
+/* Circuit patterns on the left and right sides */
+.login-container.dark::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    url("data:image/svg+xml,%3Csvg width='800' height='800' viewBox='0 0 800 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%23103562' stroke-width='1'%3E%3Cpath d='M0 400 L200 400 L200 200 L400 200 L400 600 L600 600 L600 800'/%3E%3Cpath d='M800 400 L600 400 L600 600 L400 600 L400 200 L200 200 L200 0'/%3E%3Cpath d='M0 300 L100 300 L100 100 L300 100 L300 500 L500 500 L500 700 L700 700'/%3E%3Cpath d='M800 300 L700 300 L700 500 L500 500 L500 100 L300 100 L300 0'/%3E%3Ccircle cx='100' cy='300' r='5'/%3E%3Ccircle cx='200' cy='200' r='5'/%3E%3Ccircle cx='300' cy='100' r='5'/%3E%3Ccircle cx='400' cy='200' r='5'/%3E%3Ccircle cx='400' cy='600' r='5'/%3E%3Ccircle cx='500' cy='500' r='5'/%3E%3Ccircle cx='600' cy='400' r='5'/%3E%3Ccircle cx='700' cy='300' r='5'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 0;
 }
 
 /* This creates a radial glow effect behind the shield */
@@ -39,6 +61,56 @@
   pointer-events: none;
 }
 
+/* Left side circuit pattern */
+.circuit-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 20%;
+  background-image: 
+    linear-gradient(to right, rgba(10, 22, 38, 0.7), transparent),
+    url("data:image/svg+xml,%3Csvg width='400' height='800' viewBox='0 0 400 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%234CD6FF' stroke-width='1' opacity='0.3'%3E%3Cpath d='M0 400 L100 400 L100 200 L200 200 L200 600 L300 600 L300 800'/%3E%3Cpath d='M0 300 L50 300 L50 100 L150 100 L150 500 L250 500 L250 700'/%3E%3Ccircle cx='100' cy='400' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Ccircle cx='200' cy='200' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Ccircle cx='200' cy='600' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Ccircle cx='300' cy='600' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Cpath d='M-50 200 L30 200 L30 350 L100 350 L100 500 L180 500' stroke-dasharray='5,5'/%3E%3Cpath d='M-50 600 L80 600 L80 450 L160 450' stroke-dasharray='5,5'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: left center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Right side circuit pattern */
+.circuit-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 20%;
+  background-image: 
+    linear-gradient(to left, rgba(10, 22, 38, 0.7), transparent),
+    url("data:image/svg+xml,%3Csvg width='400' height='800' viewBox='0 0 400 800' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' stroke='%234CD6FF' stroke-width='1' opacity='0.3'%3E%3Cpath d='M400 400 L300 400 L300 200 L200 200 L200 600 L100 600 L100 800'/%3E%3Cpath d='M400 300 L350 300 L350 100 L250 100 L250 500 L150 500 L150 700'/%3E%3Ccircle cx='300' cy='400' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Ccircle cx='200' cy='200' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Ccircle cx='200' cy='600' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Ccircle cx='100' cy='600' r='4' fill='%234CD6FF' opacity='0.5'/%3E%3Cpath d='M450 200 L370 200 L370 350 L300 350 L300 500 L220 500' stroke-dasharray='5,5'/%3E%3Cpath d='M450 600 L320 600 L320 450 L240 450' stroke-dasharray='5,5'/%3E%3C/g%3E%3C/svg%3E");
+  background-position: right center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  z-index: 1;
+  pointer-events: none;
+}
+
+/* Add dot grid pattern to right side */
+.dot-grid-right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 30%;
+  background-image: 
+    radial-gradient(circle, rgba(76, 214, 255, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+  background-position: center;
+  opacity: 0.3;
+  z-index: 0;
+  pointer-events: none;
+}
+
 .login-content {
   display: flex;
   flex-direction: column;
@@ -49,7 +121,7 @@
   padding: 20px;
   text-align: center;
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 /* Main title styling */
@@ -148,23 +220,22 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  max-width: 320px;
-  padding: 12px 20px;
-  background-color: rgba(0, 0, 0, 0.2);
+  max-width: 260px;
+  padding: 10px 16px;
+  background-color: #0a1626;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50px;
+  border: none;
+  border-radius: 3px;
   font-size: 16px;
-  font-weight: 500;
+  font-weight: 400;
   cursor: pointer;
   transition: all 0.3s ease;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
 }
 
 .google-sign-in-btn:hover {
-  background-color: rgba(0, 0, 0, 0.4);
-  border-color: rgba(255, 255, 255, 0.3);
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
+  background-color: #0d1e32;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.5);
 }
 
 .google-sign-in-btn:active {
@@ -175,12 +246,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  margin-right: 12px;
-  background-color: white;
-  border-radius: 50%;
-  padding: 3px;
+  width: 18px;
+  height: 18px;
+  margin-right: 10px;
+  background-color: transparent;
+  border-radius: 0;
+  padding: 0;
   flex-shrink: 0;
 }
 
@@ -193,6 +264,10 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #e8eaed;
+  font-size: 15px;
+  font-family: 'Roboto', Arial, sans-serif;
+  letter-spacing: 0.25px;
 }
 
 /* Loading spinner */
@@ -251,6 +326,11 @@
     font-size: 22px;
     margin-bottom: 30px;
   }
+
+  .circuit-left, 
+  .circuit-right {
+    width: 15%;
+  }
 }
 
 @media screen and (max-width: 480px) {
@@ -294,13 +374,19 @@
   }
   
   .google-sign-in-btn {
-    max-width: 280px;
-    padding: 10px 16px;
+    max-width: 240px;
+    padding: 8px 14px;
     font-size: 14px;
   }
   
   .login-content {
     padding: 10px;
+  }
+
+  .circuit-left, 
+  .circuit-right {
+    width: 10%;
+    opacity: 0.6;
   }
 }
 
@@ -340,6 +426,11 @@
     height: 20px;
     padding: 2px;
     margin-right: 8px;
+  }
+
+  .circuit-left, 
+  .circuit-right {
+    display: none;
   }
 }
 

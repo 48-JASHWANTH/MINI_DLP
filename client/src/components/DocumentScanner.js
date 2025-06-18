@@ -1,8 +1,16 @@
-import React, { useState } from 'react';
-import { checkText, uploadFile, viewFile, downloadFile } from '../api';
+import React, { useState, useEffect } from 'react';
+import { 
+  checkText, 
+  uploadFile, 
+  viewFile, 
+  downloadFile, 
+  getUserFolders, 
+  createUserFolder, 
+  saveProcessedFiles 
+} from '../api';
 import './DocumentScanner.css';
 
-function DocumentScanner({ isDarkMode }) {
+function DocumentScanner() {
   const [document, setDocument] = useState('');
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -11,6 +19,51 @@ function DocumentScanner({ isDarkMode }) {
   const [error, setError] = useState(null);
   const [showFileSaveConfirm, setShowFileSaveConfirm] = useState(false);
   const [tempProcessedFiles, setTempProcessedFiles] = useState(null);
+  const [folders, setFolders] = useState([]);
+  const [selectedFolderId, setSelectedFolderId] = useState('');
+  const [showNewFolderForm, setShowNewFolderForm] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+
+  useEffect(() => {
+    // Fetch folders when confirmation dialog is shown
+    if (showFileSaveConfirm) {
+      fetchUserFolders();
+    }
+  }, [showFileSaveConfirm]);
+
+  const fetchUserFolders = async () => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('user-info') || '{}');
+      if (!userInfo.token) return;
+
+      const response = await getUserFolders(userInfo.token);
+      setFolders(response.data.folders || []);
+    } catch (err) {
+      console.error('Error fetching folders:', err);
+      setError('Failed to load folders');
+    }
+  };
+
+  const handleCreateFolder = async () => {
+    if (!newFolderName.trim()) {
+      setError('Please enter a folder name');
+      return;
+    }
+
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('user-info') || '{}');
+      
+      const response = await createUserFolder(userInfo.token, { name: newFolderName });
+      
+      setFolders([...folders, response.data.folder]);
+      setSelectedFolderId(response.data.folder._id);
+      setNewFolderName('');
+      setShowNewFolderForm(false);
+    } catch (err) {
+      console.error('Error creating folder:', err);
+      setError('Failed to create folder');
+    }
+  };
 
   const scanDocument = async () => {
     if (!document.trim()) {
@@ -91,15 +144,34 @@ function DocumentScanner({ isDarkMode }) {
     }
   };
   
-  const handleSaveConfirm = () => {
-    setProcessedFiles(tempProcessedFiles);
-    setTempProcessedFiles(null);
-    setShowFileSaveConfirm(false);
+  const handleSaveConfirm = async () => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('user-info') || '{}');
+      
+      // If we have processed files, save them with folder information
+      if (tempProcessedFiles) {
+        await saveProcessedFiles(userInfo.token, {
+          highlightedFile: tempProcessedFiles.highlighted,
+          maskedFile: tempProcessedFiles.masked,
+          folderId: selectedFolderId || null
+        });
+      }
+      
+      setProcessedFiles(tempProcessedFiles);
+      setTempProcessedFiles(null);
+      setShowFileSaveConfirm(false);
+      setSelectedFolderId('');
+    } catch (err) {
+      console.error('Error saving files:', err);
+      setError('Failed to save files');
+    }
   };
   
   const handleSaveCancel = () => {
     setTempProcessedFiles(null);
     setShowFileSaveConfirm(false);
+    setSelectedFolderId('');
+    setShowNewFolderForm(false);
   };
 
   const handleDownload = (filename) => {
@@ -123,130 +195,166 @@ function DocumentScanner({ isDarkMode }) {
   };
 
   return (
-    <div className={`scanner-container ${isDarkMode ? 'dark' : ''}`}>
+    <div className="scanner-container">
       <div className="scanner-card">
-        <h2 className="scanner-title">Document Scanner</h2>
+        <h2 className="scanner-title"><i className="fas fa-search"></i> DOCUMENT<br/>SCANNER</h2>
         
-        {error && <div className="error-message">{error}</div>}
+        {error && <div className="error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
         
-        <div className="upload-section">
-          <div className="file-upload-wrapper">
-            <input
-              type="file"
-              accept=".pdf,.docx,.xlsx,.txt"
-              onChange={handleFileUpload}
-              className="file-input"
-              id="file-upload"
-              disabled={isLoading}
-            />
-            <label htmlFor="file-upload" className={`file-upload-label ${isLoading ? 'disabled' : ''}`}>
-              {fileName || 'Choose file (PDF, DOCX, XLSX, or TXT)'}
-            </label>
-          </div>
-        </div>
-
-        <div className="text-section">
-          <textarea
-            value={document}
-            onChange={(e) => setDocument(e.target.value)}
-            placeholder="Paste your text here..."
-            className="scanner-textarea"
-            disabled={isLoading}
-          />
-          <button 
-            onClick={scanDocument} 
-            className="scan-button"
-            disabled={isLoading}
-          >
-            {isLoading ? 'Scanning...' : 'Scan'}
-          </button>
-        </div>
-
-        {isLoading && (
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-            <p>Processing...</p>
-          </div>
-        )}
-        
-        {/* Save Confirmation Dialog */}
-        {showFileSaveConfirm && (
-          <div className="save-confirmation">
-            <div className="confirmation-content">
-              <h3>Sensitive Information Detected</h3>
-              <p>Sensitive information has been found in your document. Would you like to save the processed files?</p>
-              <p className="detection-summary">
-                <strong>{results.length} pattern types detected</strong> with a total of {results.reduce((sum, pattern) => sum + pattern.matches.length, 0)} instances.
-              </p>
-              <div className="confirmation-actions">
-                <button onClick={handleSaveConfirm} className="btn-confirm">
-                  Yes, Save Files
-                </button>
-                <button onClick={handleSaveCancel} className="btn-cancel">
-                  No, Just Show Results
-                </button>
+        <div className="scanner-content">
+          <div className="scanner-left">
+            <div className="upload-section">
+              <div className="file-upload-wrapper">
+                <input
+                  type="file"
+                  accept=".pdf,.docx,.xlsx,.txt"
+                  onChange={handleFileUpload}
+                  className="file-input"
+                  id="file-upload"
+                  disabled={isLoading}
+                />
+                <label htmlFor="file-upload" className={`file-upload-label ${isLoading ? 'disabled' : ''}`}>
+                  <i className="fas fa-file-upload"></i>
+                  {fileName ? fileName : 'Drop your file here or click to upload'}
+                </label>
               </div>
             </div>
-          </div>
-        )}
 
-        <div className="results-section">
-          <h3 className="results-title">Results</h3>
-          {results.length > 0 ? (
-            <div className="results-container">
-              {results.map((result, index) => (
-                <div key={index} className={`result-card ${result.isCustom ? 'custom-pattern' : 'default-pattern'}`}>
-                  <div className="pattern-header">
-                    <h4 className="pattern-name">{result.patternName}</h4>
-                    {result.isCustom ? 
-                      <span className="pattern-badge custom">Custom</span> :
-                      <span className="pattern-badge default">Default</span>
-                    }
-                  </div>
-                  {result.matches.map((match, matchIndex) => (
-                    <div key={matchIndex} className="match-item">
-                      <div className="match-line">Line {match.line}</div>
-                      <div className="match-content">
-                        {highlightMatches(match.content, match.matches)}
+            <div className="text-section">
+              <textarea
+                value={document}
+                onChange={(e) => setDocument(e.target.value)}
+                placeholder="Enter text"
+                className="scanner-textarea"
+                disabled={isLoading}
+              />
+              <button 
+                onClick={scanDocument} 
+                className="scan-button"
+                disabled={isLoading}
+              >
+                {isLoading ? <><i className="fas fa-spinner fa-spin"></i> Scanning...</> : <><i className="fas fa-search"></i> Scan</>}
+              </button>
+            </div>
+
+            {isLoading && (
+              <div className="loading-spinner">
+                <div className="spinner"></div>
+                <p><i className="fas fa-spinner fa-spin"></i> Processing...</p>
+              </div>
+            )}
+          </div>
+          
+          <div className="scanner-right">
+            <div className="results-section">
+              <h3 className="results-title"><i className="fas fa-clipboard-list"></i> Results</h3>
+              {results.length > 0 ? (
+                <div className="results-container">
+                  {results.map((result, index) => (
+                    <div key={index} className={`result-card ${result.isCustom ? 'custom-pattern' : 'default-pattern'}`}>
+                      <div className="pattern-header">
+                        <h4 className="pattern-name"><i className="fas fa-fingerprint"></i> {result.patternName}</h4>
+                        {result.isCustom ? 
+                          <span className="pattern-badge custom"><i className="fas fa-user-edit"></i> Custom</span> :
+                          <span className="pattern-badge default"><i className="fas fa-shield-alt"></i> Default</span>
+                        }
                       </div>
-                      <div className="match-found">
-                        <strong>Matched words:</strong> {match.matches.join(', ')}
-                      </div>
+                      {result.matches.map((match, matchIndex) => (
+                        <div key={matchIndex} className="match-item">
+                          <div className="match-line"><i className="fas fa-hashtag"></i> Line {match.line}</div>
+                          <div className="match-content">
+                            {highlightMatches(match.content, match.matches)}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   ))}
                 </div>
-              ))}
+              ) : (
+                <div className="no-results"><i className="fas fa-info-circle"></i> No matches found.</div>
+              )}
             </div>
-          ) : (
-            <p className="no-results">No matches found.</p>
-          )}
-
-          {processedFiles && (
-            <div className="processed-files">
-              <h4>Processed Documents</h4>
-              <div className="file-actions">
-                <div className="file-action-group">
-                  <h5>Highlighted Version</h5>
-                  <button onClick={() => handleView(processedFiles.highlighted)}>
-                    View
-                  </button>
-                  <button onClick={() => handleDownload(processedFiles.highlighted)}>
-                    Download
-                  </button>
+          </div>
+        </div>
+        
+        {/* Processed Files Section */}
+        {processedFiles && (
+          <div className="processed-files">
+            <h4><i className="fas fa-file-alt"></i> Processed Files</h4>
+            <div className="file-actions">
+              <div className="file-action-group">
+                <h5><i className="fas fa-highlighter"></i> Highlighted File</h5>
+                <div>
+                  <button onClick={() => handleView(processedFiles.highlighted)}><i className="fas fa-eye"></i> View</button>
+                  <button onClick={() => handleDownload(processedFiles.highlighted)}><i className="fas fa-download"></i> Download</button>
                 </div>
-                <div className="file-action-group">
-                  <h5>Masked Version</h5>
-                  <button onClick={() => handleView(processedFiles.masked)}>
-                    View
-                  </button>
-                  <button onClick={() => handleDownload(processedFiles.masked)}>
-                    Download
-                  </button>
+              </div>
+              
+              <div className="file-action-group">
+                <h5><i className="fas fa-mask"></i> Masked File</h5>
+                <div>
+                  <button onClick={() => handleView(processedFiles.masked)}><i className="fas fa-eye"></i> View</button>
+                  <button onClick={() => handleDownload(processedFiles.masked)}><i className="fas fa-download"></i> Download</button>
                 </div>
               </div>
             </div>
-          )}
-        </div>
+          </div>
+        )}
+        
+        {/* Confirmation Dialog with Folder Selection */}
+        {showFileSaveConfirm && (
+          <div className="save-confirmation">
+            <div className="confirmation-content">
+              <h3><i className="fas fa-exclamation-triangle"></i> Sensitive Information Detected</h3>
+              <div className="detection-summary">
+                <p><i className="fas fa-info-circle"></i> We found {results.length} pattern match(es) in your document. Would you like to save the processed files?</p>
+              </div>
+              
+              <div className="folder-selection">
+                <h4><i className="fas fa-folder-open"></i> Select a folder to save files:</h4>
+                <select 
+                  value={selectedFolderId} 
+                  onChange={(e) => setSelectedFolderId(e.target.value)}
+                  className="folder-select"
+                >
+                  <option value=""><i className="fas fa-folder"></i> Root (No folder)</option>
+                  {folders.map(folder => (
+                    <option key={folder._id} value={folder._id}>
+                      {folder.name}
+                    </option>
+                  ))}
+                </select>
+                
+                {!showNewFolderForm ? (
+                  <button 
+                    className="new-folder-button" 
+                    onClick={() => setShowNewFolderForm(true)}
+                  >
+                    <i className="fas fa-folder-plus"></i> Create New Folder
+                  </button>
+                ) : (
+                  <div className="new-folder-form">
+                    <input
+                      type="text"
+                      placeholder="Enter folder name"
+                      value={newFolderName}
+                      onChange={(e) => setNewFolderName(e.target.value)}
+                    />
+                    <div className="folder-form-buttons">
+                      <button onClick={handleCreateFolder}><i className="fas fa-check"></i> Create</button>
+                      <button onClick={() => setShowNewFolderForm(false)}><i className="fas fa-times"></i> Cancel</button>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              <div className="confirmation-actions">
+                <button className="btn-confirm" onClick={handleSaveConfirm}><i className="fas fa-save"></i> Save Files</button>
+                <button className="btn-cancel" onClick={handleSaveCancel}><i className="fas fa-times"></i> Cancel</button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

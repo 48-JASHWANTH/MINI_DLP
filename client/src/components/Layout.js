@@ -5,6 +5,7 @@ import PatternForm from './PatternForm';
 import PatternList from './PatternList';
 import DocumentScanner from './DocumentScanner';
 import UserProfile from './UserProfile';
+import ProcessedFiles from './ProcessedFiles';
 import './Layout.css';
 
 function Layout({ setIsAuthenticated }) {
@@ -36,6 +37,10 @@ function Layout({ setIsAuthenticated }) {
     setActiveView('newPattern');
   };
   
+  const handleProcessedFilesClick = () => {
+    setActiveView('processedFiles');
+  };
+  
   const handleProfileClick = () => {
     setActiveView('profile');
   };
@@ -51,18 +56,18 @@ function Layout({ setIsAuthenticated }) {
 
   const renderContent = () => {
     if (activeView === 'fileUpload') {
-      return <DocumentScanner isDarkMode={isDarkMode} />;
+      return <DocumentScanner />;
     } else if (activeView === 'profile') {
-      return <UserProfile isDarkMode={isDarkMode} />;
+      return <UserProfile />;
+    } else if (activeView === 'processedFiles') {
+      return <ProcessedFiles />;
     }
     return (
       <div className="pattern-management">
         <PatternForm 
-          isDarkMode={isDarkMode} 
           onPatternAdded={handlePatternAdded} 
         />
         <PatternList 
-          isDarkMode={isDarkMode} 
           refreshTrigger={patternRefreshTrigger} 
         />
       </div>
@@ -74,9 +79,8 @@ function Layout({ setIsAuthenticated }) {
       <MenuBar 
         onFileUploadClick={handleFileUploadClick}
         onNewPatternClick={handleNewPatternClick}
+        onProcessedFilesClick={handleProcessedFilesClick}
         onProfileClick={handleProfileClick}
-        isDarkMode={isDarkMode}
-        onToggleDarkMode={toggleDarkMode}
         setIsAuthenticated={setIsAuthenticated}
       />
 

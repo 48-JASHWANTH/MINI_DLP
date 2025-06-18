@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MenuBar.css';
 
-function MenuBar({ onFileUploadClick, onNewPatternClick, onProfileClick, isDarkMode, onToggleDarkMode, setIsAuthenticated }) {
+function MenuBar({ onFileUploadClick, onNewPatternClick, onProcessedFilesClick, onProfileClick, setIsAuthenticated }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -65,10 +65,10 @@ function MenuBar({ onFileUploadClick, onNewPatternClick, onProfileClick, isDarkM
         onClick={() => setIsMenuOpen(false)}
       />
 
-      <div className={`side-menu ${isDarkMode ? 'dark' : ''} ${isMenuOpen ? 'open' : ''}`}>
+      <div className={`side-menu ${isMenuOpen ? 'open' : ''}`}>
         <div className="menu-logo">
           <i className="fas fa-shield-alt"></i>
-          <span>MINI - DLP</span>
+          <span>MINI-DLP</span>
         </div>
         
         <div className="menu-buttons">
@@ -76,8 +76,12 @@ function MenuBar({ onFileUploadClick, onNewPatternClick, onProfileClick, isDarkM
             <i className="fas fa-file-upload"></i>
             <span>File Upload</span>
           </button>
+          <button className="menu-button" onClick={() => handleMenuClick(onProcessedFilesClick)}>
+            <i className="fas fa-file-alt"></i>
+            <span>Processed Files</span>
+          </button>
           <button className="menu-button" onClick={() => handleMenuClick(onNewPatternClick)}>
-            <i className="fas fa-plus"></i>
+            <i className="fas fa-plus-circle"></i>
             <span>New Pattern</span>
           </button>
           <button className="menu-button" onClick={() => handleMenuClick(onProfileClick)}>
@@ -87,10 +91,6 @@ function MenuBar({ onFileUploadClick, onNewPatternClick, onProfileClick, isDarkM
         </div>
 
         <div className="menu-footer">
-          <button className="theme-toggle" onClick={onToggleDarkMode}>
-            <i className={`fas ${isDarkMode ? 'fa-sun' : 'fa-moon'}`}></i>
-            <span>{isDarkMode ? 'Light Mode' : 'Dark Mode'}</span>
-          </button>
           <button className="logout-button" onClick={handleLogout}>
             <i className="fas fa-sign-out-alt"></i>
             <span>Logout</span>
