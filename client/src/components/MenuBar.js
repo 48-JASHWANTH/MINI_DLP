@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './MenuBar.css';
 
-function MenuBar({ onFileUploadClick, onNewPatternClick, onProcessedFilesClick, onProfileClick, setIsAuthenticated }) {
+function MenuBar({ onFileUploadClick, onNewPatternClick, onProcessedFilesClick, onProfileClick, onDashboardClick, setIsAuthenticated }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
 
@@ -72,6 +72,10 @@ function MenuBar({ onFileUploadClick, onNewPatternClick, onProcessedFilesClick, 
         </div>
         
         <div className="menu-buttons">
+          <button className="menu-button" onClick={() => handleMenuClick(onDashboardClick)}>
+            <i className="fas fa-chart-bar"></i>
+            <span>Dashboard</span>
+          </button>
           <button className="menu-button" onClick={() => handleMenuClick(onFileUploadClick)}>
             <i className="fas fa-file-upload"></i>
             <span>File Upload</span>

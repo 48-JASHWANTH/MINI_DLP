@@ -6,6 +6,12 @@
   --border-color: #ddd;
   --accent-color: #00e1ff;
   --accent-hover: #00b8cc;
+  --accent-color-light: #66ecff;
+  --card-bg: #ffffff;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --table-header-bg: #f1f1f1;
+  --table-hover-bg: #f9f9f9;
 }
 
 .dark {
@@ -16,6 +22,12 @@
   --border-color: #333;
   --accent-color: #00e1ff;
   --accent-hover: #00b8cc;
+  --accent-color-light: #66ecff;
+  --card-bg: #1a1a1a;
+  --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --card-shadow-hover: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --table-header-bg: #222222;
+  --table-hover-bg: #1e1e1e;
 }
 
 body {
@@ -34,7 +46,6 @@ body {
 
 .main-content {
   flex: 1;
-  padding: 20px;
   margin-left: 250px;
   transition: margin-left 0.3s ease;
   background-color: var(--bg-secondary);

@@ -14,13 +14,11 @@
 
 .main-content {
   flex: 1;
-  padding: 20px;
   margin-left: 250px;
 }
 
 .content-wrapper {
   max-width: 1200px;
-  padding: 20px;
   width: 100%;
 }
 

@@ -79,5 +79,10 @@ export const uploadFile = (formData, token) => apiApi.post('/upload-file', formD
   }
 });
 
+// Analytics endpoint
+export const getAnalytics = (token) => apiApi.get('/analytics', {
+  headers: { Authorization: `Bearer ${token}` }
+});
+
 export const viewFile = (filename) => `http://localhost:9643/api/view/${filename}`;
 export const downloadFile = (filename) => `http://localhost:9643/api/download/${filename}`;

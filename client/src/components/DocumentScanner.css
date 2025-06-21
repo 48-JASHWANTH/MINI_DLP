@@ -690,3 +690,40 @@
     font-size: 18px;
   }
 }
+
+/* Add at the beginning of the file */
+.scanner-tabs {
+  display: flex;
+  margin-bottom: 20px;
+  border-bottom: 1px solid #00e1ff;
+  width: 100%;
+  max-width: 1200px;
+}
+
+.scanner-tab {
+  padding: 12px 20px;
+  background: none;
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: rgba(0, 225, 255, 0.6);
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+}
+
+.scanner-tab i {
+  margin-right: 8px;
+}
+
+.scanner-tab.active {
+  color: #00e1ff;
+  border-bottom-color: #00e1ff;
+  font-weight: 500;
+}
+
+.scanner-tab:hover:not(.active) {
+  color: rgba(0, 225, 255, 0.8);
+  background-color: rgba(0, 225, 255, 0.05);
+}

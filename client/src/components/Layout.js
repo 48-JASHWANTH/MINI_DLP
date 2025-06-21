@@ -6,10 +6,11 @@ import PatternList from './PatternList';
 import DocumentScanner from './DocumentScanner';
 import UserProfile from './UserProfile';
 import ProcessedFiles from './ProcessedFiles';
+import Dashboard from './Dashboard';
 import './Layout.css';
 
 function Layout({ setIsAuthenticated }) {
-  const [activeView, setActiveView] = useState('fileUpload');
+  const [activeView, setActiveView] = useState('dashboard');
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedMode = localStorage.getItem('darkMode');
     return savedMode !== null ? JSON.parse(savedMode) : true;
@@ -28,6 +29,10 @@ function Layout({ setIsAuthenticated }) {
   useEffect(() => {
     localStorage.setItem('darkMode', JSON.stringify(isDarkMode));
   }, [isDarkMode]);
+
+  const handleDashboardClick = () => {
+    setActiveView('dashboard');
+  };
 
   const handleFileUploadClick = () => {
     setActiveView('fileUpload');
@@ -55,7 +60,9 @@ function Layout({ setIsAuthenticated }) {
   };
 
   const renderContent = () => {
-    if (activeView === 'fileUpload') {
+    if (activeView === 'dashboard') {
+      return <Dashboard />;
+    } else if (activeView === 'fileUpload') {
       return <DocumentScanner />;
     } else if (activeView === 'profile') {
       return <UserProfile />;
@@ -77,6 +84,7 @@ function Layout({ setIsAuthenticated }) {
   return (
     <div className={`app ${isDarkMode ? 'dark' : ''}`}>
       <MenuBar 
+        onDashboardClick={handleDashboardClick}
         onFileUploadClick={handleFileUploadClick}
         onNewPatternClick={handleNewPatternClick}
         onProcessedFilesClick={handleProcessedFilesClick}

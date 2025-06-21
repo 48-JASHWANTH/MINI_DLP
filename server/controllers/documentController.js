@@ -809,5 +809,123 @@ exports.downloadFile = (req, res) => {
   res.download(filePath);
 };
 
+// Analytics endpoint to get statistics on processed files and patterns
+exports.getAnalytics = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: "Authentication required for analytics" });
+    }
+
+    const UserModel = require('../models/userModel');
+    const user = await UserModel.findById(req.user._id);
+
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // Get processed files data
+    const processedFiles = user.processedFiles || [];
+    
+    // Count files by type
+    const fileTypeCount = {};
+    processedFiles.forEach(file => {
+      const fileType = file.fileType || 'unknown';
+      if (!fileTypeCount[fileType]) {
+        fileTypeCount[fileType] = 0;
+      }
+      fileTypeCount[fileType]++;
+    });
+
+    // Group files by date (monthly)
+    const filesByMonth = {};
+    processedFiles.forEach(file => {
+      const date = new Date(file.processedAt);
+      const monthYear = `${date.getMonth() + 1}/${date.getFullYear()}`;
+      if (!filesByMonth[monthYear]) {
+        filesByMonth[monthYear] = 0;
+      }
+      filesByMonth[monthYear]++;
+    });
+
+    // Calculate total and average file size
+    let totalSize = 0;
+    processedFiles.forEach(file => {
+      totalSize += file.fileSize || 0;
+    });
+    const averageSize = processedFiles.length > 0 ? Math.round(totalSize / processedFiles.length) : 0;
+
+    // Get user patterns data
+    const userPatterns = user.customPatterns || [];
+    
+    // Analyze files for risk metrics (mocked data - in a real implementation this would be stored with each file)
+    // This is simplification - in a production system you would store risk scores with each processed file
+    const riskLevels = ['Low', 'Medium', 'High'];
+    const riskDistribution = {};
+    const patternOccurrences = {};
+    
+    // Initialize pattern occurrences
+    userPatterns.forEach(pattern => {
+      patternOccurrences[pattern.name] = 0;
+    });
+    
+    // Default patterns
+    const defaultPatterns = ['Credit Card', 'SSN', 'Phone Number', 'Email', 'Aadhaar'];
+    defaultPatterns.forEach(pattern => {
+      patternOccurrences[pattern] = 0;
+    });
+    
+    // Mock risk levels and pattern occurrences based on file count
+    for (let i = 0; i < processedFiles.length; i++) {
+      // Assign mock risk levels
+      const riskLevel = riskLevels[Math.floor(Math.random() * riskLevels.length)];
+      if (!riskDistribution[riskLevel]) {
+        riskDistribution[riskLevel] = 0;
+      }
+      riskDistribution[riskLevel]++;
+      
+      // Assign mock pattern occurrences
+      const patternKeys = Object.keys(patternOccurrences);
+      const patternCount = Math.floor(Math.random() * 3) + 1; // 1-3 patterns per file
+      for (let j = 0; j < patternCount; j++) {
+        const randomPattern = patternKeys[Math.floor(Math.random() * patternKeys.length)];
+        patternOccurrences[randomPattern]++;
+      }
+    }
+    
+    // Sort pattern occurrences by count (descending)
+    const sortedPatternOccurrences = Object.entries(patternOccurrences)
+      .filter(([_, count]) => count > 0) // Only include patterns that occurred
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5) // Get top 5
+      .reduce((obj, [key, value]) => {
+        obj[key] = value;
+        return obj;
+      }, {});
+    
+    res.json({
+      totalDocuments: processedFiles.length,
+      fileTypeDistribution: fileTypeCount,
+      processedByMonth: filesByMonth,
+      totalPatterns: userPatterns.length,
+      totalStorageUsed: totalSize,
+      averageFileSize: averageSize,
+      // Risk metrics
+      riskDistribution: riskDistribution,
+      // Pattern detection stats
+      topDetectedPatterns: sortedPatternOccurrences,
+      // Recent files
+      recentFiles: processedFiles.slice(-5).map(file => ({
+        name: file.originalName,
+        date: file.processedAt,
+        type: file.fileType,
+        size: file.fileSize
+      }))
+    });
+  } catch (error) {
+    console.error("Error generating analytics:", error);
+    res.status(500).json({ error: "Failed to generate analytics data" });
+  }
+};
+
 // Export processText for testing
 exports.processText = processText;

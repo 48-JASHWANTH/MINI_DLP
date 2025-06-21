@@ -6,6 +6,7 @@ const multer = require('multer');
 const fs = require('fs');
 const authMiddleware = require('../middleware/authMiddleware');
 
+
 // Document processing routes (with optional auth)
 // The middleware will attach the user to req if authenticated, but allow guests to proceed
 const optionalAuth = (req, res, next) => {
@@ -55,5 +56,6 @@ router.post('/check-text', optionalAuth, documentController.checkText);
 router.post('/upload-file', optionalAuth, upload.single('file'), documentController.processFile);
 router.get('/view/:filename', documentController.viewFile);
 router.get('/download/:filename', documentController.downloadFile);
+router.get('/analytics', authMiddleware, documentController.getAnalytics); // Analytics requires authentication
 
 module.exports = router;
