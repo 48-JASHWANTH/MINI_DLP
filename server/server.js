@@ -9,7 +9,7 @@ const store = require('./store');
 
 
 const corsOptions = {
-    origin: ["http://localhost:3000"],
+    origin: ["http://localhost:3000","https://mini-dlp.onrender.com"],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }
