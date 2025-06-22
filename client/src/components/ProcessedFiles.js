@@ -230,12 +230,12 @@ function ProcessedFiles() {
     }
   };
 
-  const handleViewFile = (filename) => {
-    window.open(`http://localhost:9643/api/view/${filename}`, '_blank');
+  const handleViewFile = (fileId) => {
+    window.open(`http://localhost:9643/api/view/${fileId}`, '_blank');
   };
 
-  const handleDownloadFile = (filename) => {
-    window.location.href = `http://localhost:9643/api/download/${filename}`;
+  const handleDownloadFile = (fileId) => {
+    window.location.href = `http://localhost:9643/api/download/${fileId}`;
   };
 
   const toggleFileSelection = (fileId) => {
@@ -273,21 +273,29 @@ function ProcessedFiles() {
   };
 
   const getVisibleFiles = () => {
-    // Filter files based on current folder, search term, and file type
+    // Filter files based on search term, file type, and current folder
     return files.filter(file => {
-      const matchesFolder = currentFolder 
-        ? file.folderId === currentFolder 
-        : !file.folderId; // If no folder selected, show only files without folders
+      // If a folder is selected, only show files from that folder
+      if (currentFolder && file.folderId !== currentFolder) {
+        return false;
+      }
       
-      const matchesSearch = searchTerm
-        ? file.originalName.toLowerCase().includes(searchTerm.toLowerCase())
-        : true;
-        
-      const matchesFileType = fileTypeFilter
-        ? file.fileType === fileTypeFilter
-        : true;
-        
-      return matchesFolder && matchesSearch && matchesFileType;
+      // If we're in the main view (no folder selected), only show files without a folderId
+      if (!currentFolder && file.folderId) {
+        return false;
+      }
+      
+      // Apply search term filter if provided
+      if (searchTerm && !file.originalName.toLowerCase().includes(searchTerm.toLowerCase())) {
+        return false;
+      }
+      
+      // Apply file type filter if selected
+      if (fileTypeFilter && file.fileType !== fileTypeFilter) {
+        return false;
+      }
+      
+      return true;
     });
   };
 

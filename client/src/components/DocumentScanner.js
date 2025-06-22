@@ -109,6 +109,11 @@ function DocumentScanner() {
       const formData = new FormData();
       formData.append('file', file);
       
+      // Add folderId to formData if selected
+      if (selectedFolderId) {
+        formData.append('folderId', selectedFolderId);
+      }
+      
       setIsLoading(true);
       setError(null);
       
@@ -117,7 +122,8 @@ function DocumentScanner() {
         const userInfo = JSON.parse(localStorage.getItem('user-info') || '{}');
         const token = userInfo.token;
         
-        const response = await uploadFile(formData, token);
+        // Pass the folder ID during upload
+        const response = await uploadFile(formData, token, selectedFolderId);
         setDocument(response.data.text || '');
         
         // Show all patterns, both default and custom
@@ -125,8 +131,8 @@ function DocumentScanner() {
         
         // Store processed files temporarily
         setTempProcessedFiles({
-          highlighted: response.data.highlightedFile,
-          masked: response.data.maskedFile
+          highlighted: response.data.highlightedFileId,
+          masked: response.data.maskedFileId
         });
         
         // If we found sensitive information, show confirmation
@@ -150,9 +156,10 @@ function DocumentScanner() {
       
       // If we have processed files, save them with folder information
       if (tempProcessedFiles) {
+        // Only use saveProcessedFiles if the files were already processed without a folder
         await saveProcessedFiles(userInfo.token, {
-          highlightedFile: tempProcessedFiles.highlighted,
-          maskedFile: tempProcessedFiles.masked,
+          highlightedFileId: tempProcessedFiles.highlighted,
+          maskedFileId: tempProcessedFiles.masked,
           folderId: selectedFolderId || null
         });
       }
@@ -174,12 +181,12 @@ function DocumentScanner() {
     setShowNewFolderForm(false);
   };
 
-  const handleDownload = (filename) => {
-    window.location.href = downloadFile(filename);
+  const handleDownload = (fileId) => {
+    window.location.href = downloadFile(fileId);
   };
 
-  const handleView = (filename) => {
-    window.open(viewFile(filename), '_blank');
+  const handleView = (fileId) => {
+    window.open(viewFile(fileId), '_blank');
   };
 
   const highlightMatches = (content, matches) => {

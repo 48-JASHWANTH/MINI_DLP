@@ -7,6 +7,9 @@ const path = require("path");
 const { PDFDocument, rgb, StandardFonts } = require('pdf-lib');
 const docx = require("docx");
 const { Document, Paragraph, TextRun } = docx;
+const FileModel = require("../models/fileModel");
+const UserModel = require("../models/userModel");
+const mongoose = require("mongoose");
 
 exports.checkText = async (req, res) => {
   const { text } = req.body;
@@ -82,7 +85,7 @@ exports.processFile = async (req, res) => {
       console.log('[processFile] File will be assigned to folder:', folderId);
     }
     
-    const filePath = path.resolve(req.file.path);
+    const fileBuffer = req.file.buffer;
     const fileExtension = path.extname(req.file.originalname).toLowerCase();
     let text;
 
@@ -90,29 +93,28 @@ exports.processFile = async (req, res) => {
     switch (fileExtension) {
       case ".pdf":
         console.log('[processFile] Extracting text from PDF');
-        const dataBuffer = fs.readFileSync(filePath);
-        const pdfData = await pdf(dataBuffer);
+        const pdfData = await pdf(fileBuffer);
         text = pdfData.text;
         break;
 
       case ".docx":
         console.log('[processFile] Extracting text from DOCX');
-        const mammothResult = await mammoth.extractRawText({ path: filePath });
+        const mammothResult = await mammoth.extractRawText({ buffer: fileBuffer });
         text = mammothResult.value;
         break;
 
       case ".xlsx":
         console.log('[processFile] Extracting text from XLSX');
-        text = extractTextFromXlsx(filePath);
+        const workbook = xlsx.read(fileBuffer);
+        text = extractTextFromWorkbook(workbook);
         break;
 
       case ".txt":
         console.log('[processFile] Reading text file');
-        text = fs.readFileSync(filePath, "utf8");
+        text = fileBuffer.toString('utf8');
         break;
 
       default:
-        fs.unlinkSync(filePath);
         return res.status(400).json({ error: "Unsupported file type" });
     }
     
@@ -160,30 +162,77 @@ exports.processFile = async (req, res) => {
     }
     
     // Generate highlighted and masked versions
-    const processedDir = path.join(__dirname, '../processed');
-    if (!fs.existsSync(processedDir)) {
-      fs.mkdirSync(processedDir, { recursive: true });
-    }
-
-    const timestamp = Date.now();
-    const highlightedFile = `highlighted-${timestamp}.pdf`;
-    const maskedFile = `masked-${timestamp}.pdf`;
-
     console.log('[processFile] Generating highlighted and masked PDFs');
     const highlightedPdf = await createHighlightedPDF(text, matches);
     const maskedPdf = await createMaskedPDF(text, matches);
 
-    fs.writeFileSync(path.join(processedDir, highlightedFile), highlightedPdf);
-    fs.writeFileSync(path.join(processedDir, maskedFile), maskedPdf);
+    const timestamp = Date.now();
+    const highlightedFileName = `highlighted-${timestamp}.pdf`;
+    const maskedFileName = `masked-${timestamp}.pdf`;
 
-    // Clean up the uploaded file
-    fs.unlinkSync(filePath);
+    // Debug info
+    console.log('[processFile] File buffer type:', fileBuffer.constructor.name);
+    console.log('[processFile] Highlighted PDF type:', highlightedPdf.constructor.name);
+    console.log('[processFile] Masked PDF type:', maskedPdf.constructor.name);
+
+    // Save original file to database
+    const originalFile = new FileModel({
+      originalName: req.file.originalname,
+      fileName: `original-${timestamp}${fileExtension}`,
+      fileType: fileExtension,
+      fileSize: req.file.size,
+      fileData: Buffer.from(fileBuffer),
+      userId: req.user ? req.user._id : null,
+      folderId: folderId || null
+    });
+    
+    try {
+      await originalFile.save();
+      console.log('[processFile] Successfully saved original file');
+    } catch (error) {
+      console.error('[processFile] Error saving original file:', error);
+      throw error;
+    }
+    
+    // Save highlighted PDF to database
+    const highlightedFile = new FileModel({
+      originalName: req.file.originalname,
+      fileName: highlightedFileName,
+      fileType: '.pdf',
+      fileSize: Buffer.byteLength(highlightedPdf),
+      fileData: Buffer.from(highlightedPdf),
+      userId: req.user ? req.user._id : null,
+      folderId: folderId || null,
+      isHighlighted: true,
+      originalFileId: originalFile._id
+    });
+    
+    try {
+      await highlightedFile.save();
+      console.log('[processFile] Successfully saved highlighted file');
+    } catch (error) {
+      console.error('[processFile] Error saving highlighted file:', error);
+      throw error;
+    }
+    
+    // Save masked PDF to database
+    const maskedFile = new FileModel({
+      originalName: req.file.originalname,
+      fileName: maskedFileName,
+      fileType: '.pdf',
+      fileSize: Buffer.byteLength(maskedPdf),
+      fileData: Buffer.from(maskedPdf),
+      userId: req.user ? req.user._id : null,
+      folderId: folderId || null,
+      isMasked: true,
+      originalFileId: originalFile._id
+    });
+    
+    await maskedFile.save();
 
     // If user is authenticated, associate files with user
     if (req.user) {
       console.log('[processFile] Associating files with user:', req.user._id);
-      const UserModel = require('../models/userModel');
-      const fileSize = Buffer.byteLength(highlightedPdf) + Buffer.byteLength(maskedPdf);
       
       // Validate folderId if provided
       if (folderId) {
@@ -203,10 +252,10 @@ exports.processFile = async (req, res) => {
         $push: {
           processedFiles: {
             originalName: req.file.originalname,
-            highlightedVersion: highlightedFile,
-            maskedVersion: maskedFile,
+            highlightedVersion: highlightedFile._id,
+            maskedVersion: maskedFile._id,
             processedAt: new Date(),
-            fileSize: fileSize,
+            fileSize: req.file.size + Buffer.byteLength(highlightedPdf) + Buffer.byteLength(maskedPdf),
             fileType: fileExtension,
             folderId: folderId || null
           }
@@ -219,8 +268,8 @@ exports.processFile = async (req, res) => {
     res.json({
       matches,
       text,
-      highlightedFile,
-      maskedFile
+      highlightedFileId: highlightedFile._id,
+      maskedFileId: maskedFile._id
     });
   } catch (error) {
     console.error("[processFile] Error processing file:", error);
@@ -228,9 +277,8 @@ exports.processFile = async (req, res) => {
   }
 };
 
-// Helper function to extract text from Excel files
-function extractTextFromXlsx(filePath) {
-  const workbook = xlsx.readFile(filePath);
+// Helper function to extract text from Excel workbook
+function extractTextFromWorkbook(workbook) {
   let extractedText = "";
 
   workbook.SheetNames.forEach((sheetName) => {
@@ -784,29 +832,43 @@ async function createMaskedPDF(content, matches) {
   return await pdfDoc.save();
 }
 
-// Add new endpoints to serve processed files
-exports.viewFile = (req, res) => {
-  const { filename } = req.params;
-  const filePath = path.join(__dirname, '../processed', filename);
+// Update the view and download endpoints to retrieve files from the database
+exports.viewFile = async (req, res) => {
+  const { fileId } = req.params;
   
-  if (!fs.existsSync(filePath)) {
+  try {
+    const file = await FileModel.findById(fileId);
+  
+    if (!file) {
     return res.status(404).json({ error: "File not found" });
   }
 
   res.setHeader('Content-Type', 'application/pdf');
-  res.setHeader('Content-Disposition', `inline; filename="${filename}"`);
-  res.sendFile(filePath);
+    res.setHeader('Content-Disposition', `inline; filename="${file.fileName}"`);
+    res.send(file.fileData);
+  } catch (error) {
+    console.error("[viewFile] Error retrieving file:", error);
+    res.status(500).json({ error: "Error retrieving file" });
+  }
 };
 
-exports.downloadFile = (req, res) => {
-  const { filename } = req.params;
-  const filePath = path.join(__dirname, '../processed', filename);
+exports.downloadFile = async (req, res) => {
+  const { fileId } = req.params;
   
-  if (!fs.existsSync(filePath)) {
+  try {
+    const file = await FileModel.findById(fileId);
+  
+    if (!file) {
     return res.status(404).json({ error: "File not found" });
   }
 
-  res.download(filePath);
+    res.setHeader('Content-Type', 'application/octet-stream');
+    res.setHeader('Content-Disposition', `attachment; filename="${file.fileName}"`);
+    res.send(file.fileData);
+  } catch (error) {
+    console.error("[downloadFile] Error downloading file:", error);
+    res.status(500).json({ error: "Error downloading file" });
+  }
 };
 
 // Analytics endpoint to get statistics on processed files and patterns
@@ -816,7 +878,6 @@ exports.getAnalytics = async (req, res) => {
       return res.status(401).json({ error: "Authentication required for analytics" });
     }
 
-    const UserModel = require('../models/userModel');
     const user = await UserModel.findById(req.user._id);
 
     if (!user) {
@@ -924,6 +985,96 @@ exports.getAnalytics = async (req, res) => {
   } catch (error) {
     console.error("Error generating analytics:", error);
     res.status(500).json({ error: "Failed to generate analytics data" });
+  }
+};
+
+// Save processed files
+exports.saveProcessedFiles = async (req, res) => {
+  try {
+    const { highlightedFileId, maskedFileId, folderId } = req.body;
+
+    // Validate IDs
+    if (!highlightedFileId || !maskedFileId) {
+      return res.status(400).json({ error: "File IDs are required" });
+    }
+
+    // Validate folder ID if provided
+    if (folderId && !mongoose.Types.ObjectId.isValid(folderId)) {
+      return res.status(400).json({ error: "Invalid folder ID" });
+    }
+
+    // Check if files exist
+    const highlightedFile = await FileModel.findById(highlightedFileId);
+    const maskedFile = await FileModel.findById(maskedFileId);
+
+    if (!highlightedFile || !maskedFile) {
+      return res.status(404).json({ error: "Files not found" });
+    }
+
+    // Check if folder exists if folderId is provided
+    if (folderId) {
+      const user = await UserModel.findById(req.user._id);
+      const folderExists = user.folders.some(folder => 
+        folder._id.toString() === folderId
+      );
+
+      if (!folderExists) {
+        return res.status(404).json({ error: "Folder not found" });
+      }
+    }
+
+    // Update both files with folder ID
+    await FileModel.updateMany(
+      { _id: { $in: [highlightedFileId, maskedFileId] } },
+      { folderId: folderId || null }
+    );
+
+    // If there's an original file, update it too
+    if (highlightedFile.originalFileId) {
+      await FileModel.updateMany(
+        { _id: highlightedFile.originalFileId },
+        { folderId: folderId || null }
+      );
+    }
+
+    // Now update the user's processedFiles array
+    // First, check if the files are already in the array to avoid duplicates
+    const user = await UserModel.findById(req.user._id);
+    const fileAlreadyExists = user.processedFiles.some(file => 
+      file.highlightedVersion && file.highlightedVersion.toString() === highlightedFileId
+    );
+
+    if (!fileAlreadyExists) {
+      // Add the files to the user's processedFiles
+      await UserModel.findByIdAndUpdate(req.user._id, {
+        $push: {
+          processedFiles: {
+            originalName: highlightedFile.originalName,
+            highlightedVersion: highlightedFileId,
+            maskedVersion: maskedFileId,
+            processedAt: new Date(),
+            fileType: highlightedFile.fileType,
+            folderId: folderId || null
+          }
+        }
+      });
+    } else {
+      // Update existing file's folder
+      await UserModel.updateOne(
+        { 
+          _id: req.user._id,
+          "processedFiles.highlightedVersion": highlightedFileId
+        },
+        {
+          $set: { "processedFiles.$.folderId": folderId || null }
+        }
+      );
+    }
+
+    res.json({ success: true });
+  } catch (error) {
+    console.error("Error saving processed files:", error);
+    res.status(500).json({ error: "Error saving files" });
   }
 };
 

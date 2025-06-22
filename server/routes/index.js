@@ -2,8 +2,7 @@ const express = require('express');
 const router = express.Router();
 const patternController = require('../controllers/patternController');
 const documentController = require('../controllers/documentController');
-const multer = require('multer');
-const fs = require('fs');
+const upload = require('../middleware/upload');
 const authMiddleware = require('../middleware/authMiddleware');
 
 
@@ -28,24 +27,6 @@ const optionalAuth = (req, res, next) => {
   });
 };
 
-// Multer configuration
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      const uploadDir = 'uploads/';
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir);
-      }
-      cb(null, uploadDir);
-    },
-    filename: (req, file, cb) => {
-      const uniqueName = Date.now() + '-' + file.originalname;
-      cb(null, uniqueName);
-    },
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
-});
-
 // Pattern routes (with optional auth)
 router.get('/patterns', optionalAuth, patternController.getPatterns);
 router.post('/patterns', optionalAuth, patternController.addPattern);
@@ -54,8 +35,9 @@ router.delete('/patterns/:index', optionalAuth, patternController.deletePattern)
 // Apply optional auth to document routes
 router.post('/check-text', optionalAuth, documentController.checkText);
 router.post('/upload-file', optionalAuth, upload.single('file'), documentController.processFile);
-router.get('/view/:filename', documentController.viewFile);
-router.get('/download/:filename', documentController.downloadFile);
+router.post('/save-processed-files', authMiddleware, documentController.saveProcessedFiles);
+router.get('/view/:fileId', documentController.viewFile);
+router.get('/download/:fileId', documentController.downloadFile);
 router.get('/analytics', authMiddleware, documentController.getAnalytics); // Analytics requires authentication
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const UserModel = require('../models/userModel');
+const FileModel = require('../models/fileModel');
 const mongoose = require('mongoose');
 const path = require('path');
 const fs = require('fs');
@@ -78,6 +79,12 @@ exports.deleteFolder = async (req, res) => {
       }
     );
     
+    // Update files in the database to remove folder association
+    await FileModel.updateMany(
+      { userId: req.user._id, folderId: folderId },
+      { $set: { folderId: null } }
+    );
+    
     res.json({ success: true });
   } catch (error) {
     console.error("Error deleting folder:", error);
@@ -122,7 +129,7 @@ exports.moveFile = async (req, res) => {
       }
     }
     
-    // Update the file's folderId
+    // Update the file's folderId in user model
     await UserModel.updateOne(
       { 
         _id: req.user._id,
@@ -132,6 +139,22 @@ exports.moveFile = async (req, res) => {
         $set: { "processedFiles.$.folderId": folderId || null }
       }
     );
+    
+    // Update the file's folderId in file model
+    const fileInfo = user.processedFiles[fileIndex];
+    if (fileInfo.highlightedVersion) {
+      await FileModel.findByIdAndUpdate(
+        fileInfo.highlightedVersion,
+        { folderId: folderId || null }
+      );
+    }
+    
+    if (fileInfo.maskedVersion) {
+      await FileModel.findByIdAndUpdate(
+        fileInfo.maskedVersion,
+        { folderId: folderId || null }
+      );
+    }
     
     res.json({ success: true });
   } catch (error) {
@@ -166,7 +189,10 @@ exports.bulkMoveFiles = async (req, res) => {
       }
     }
     
-    // Update all files in the array
+    // Get user to get file information
+    const user = await UserModel.findById(req.user._id);
+    
+    // Update all files in the user model
     await UserModel.updateOne(
       { _id: req.user._id },
       {
@@ -179,6 +205,26 @@ exports.bulkMoveFiles = async (req, res) => {
         multi: true
       }
     );
+    
+    // Update files in the file model
+    for (const fileId of fileIds) {
+      const fileInfo = user.processedFiles.find(f => f._id.toString() === fileId);
+      if (fileInfo) {
+        if (fileInfo.highlightedVersion) {
+          await FileModel.findByIdAndUpdate(
+            fileInfo.highlightedVersion,
+            { folderId: folderId || null }
+          );
+        }
+        
+        if (fileInfo.maskedVersion) {
+          await FileModel.findByIdAndUpdate(
+            fileInfo.maskedVersion,
+            { folderId: folderId || null }
+          );
+        }
+      }
+    }
     
     res.json({ success: true });
   } catch (error) {
@@ -212,17 +258,13 @@ exports.deleteFile = async (req, res) => {
       return res.status(404).json({ error: "File not found" });
     }
     
-    // Delete the physical files
-    const processedDir = path.join(__dirname, '../processed');
-    const highlightedPath = path.join(processedDir, file.highlightedVersion);
-    const maskedPath = path.join(processedDir, file.maskedVersion);
-    
-    if (fs.existsSync(highlightedPath)) {
-      fs.unlinkSync(highlightedPath);
+    // Delete the files from the database
+    if (file.highlightedVersion) {
+      await FileModel.findByIdAndDelete(file.highlightedVersion);
     }
     
-    if (fs.existsSync(maskedPath)) {
-      fs.unlinkSync(maskedPath);
+    if (file.maskedVersion) {
+      await FileModel.findByIdAndDelete(file.maskedVersion);
     }
     
     // Remove the file from the user's processedFiles array
@@ -241,9 +283,9 @@ exports.deleteFile = async (req, res) => {
 // Save processed files with folder information
 exports.saveProcessedFiles = async (req, res) => {
   try {
-    const { highlightedFile, maskedFile, folderId } = req.body;
+    const { highlightedFileId, maskedFileId, folderId } = req.body;
     
-    if (!highlightedFile || !maskedFile) {
+    if (!highlightedFileId || !maskedFileId) {
       return res.status(400).json({ error: "Missing file information" });
     }
     
@@ -264,44 +306,77 @@ exports.saveProcessedFiles = async (req, res) => {
       }
     }
     
-    // Get file information
-    const processedDir = path.join(__dirname, '../processed');
-    const highlightedPath = path.join(processedDir, highlightedFile);
-    const maskedPath = path.join(processedDir, maskedFile);
+    // Get file information from database
+    const highlightedFile = await FileModel.findById(highlightedFileId);
+    const maskedFile = await FileModel.findById(maskedFileId);
     
     // Check if files exist
-    if (!fs.existsSync(highlightedPath) || !fs.existsSync(maskedPath)) {
+    if (!highlightedFile || !maskedFile) {
       return res.status(404).json({ error: "Processed files not found" });
     }
     
-    // Get file stats for size
-    const highlightedStats = fs.statSync(highlightedPath);
+    // Update file folder IDs in database
+    await FileModel.findByIdAndUpdate(highlightedFileId, { folderId: folderId || null });
+    await FileModel.findByIdAndUpdate(maskedFileId, { folderId: folderId || null });
     
-    // Extract file extension from the filename
-    const fileExtension = path.extname(highlightedFile).toLowerCase();
+    // If there's an original file, update it too
+    if (highlightedFile.originalFileId) {
+      await FileModel.findByIdAndUpdate(
+        highlightedFile.originalFileId,
+        { folderId: folderId || null }
+      );
+    }
     
-    // Create a new processed file entry
-    const newFile = {
-      _id: new mongoose.Types.ObjectId(),
-      originalName: path.basename(highlightedFile, fileExtension) + fileExtension,
-      highlightedVersion: highlightedFile,
-      maskedVersion: maskedFile,
-      processedAt: new Date(),
-      fileSize: highlightedStats.size,
-      fileType: fileExtension,
-      folderId: folderId || null
-    };
-    
-    // Add the file to the user's processedFiles array
-    await UserModel.findByIdAndUpdate(
-      req.user._id,
-      { $push: { processedFiles: newFile } }
+    // Check if this file is already in the user's processedFiles array
+    const user = await UserModel.findById(req.user._id);
+    const existingFile = user.processedFiles.find(file => 
+      file.highlightedVersion && 
+      file.highlightedVersion.toString() === highlightedFileId
     );
     
-    res.status(201).json({ 
-      success: true, 
-      file: newFile
-    });
+    if (existingFile) {
+      // If file already exists in user's processedFiles, update its folder ID
+      await UserModel.updateOne(
+        { 
+          _id: req.user._id, 
+          "processedFiles.highlightedVersion": highlightedFileId 
+        },
+        { $set: { "processedFiles.$.folderId": folderId || null } }
+      );
+      
+      res.status(200).json({ 
+        success: true, 
+        file: {
+          ...existingFile,
+          folderId: folderId || null
+        },
+        message: 'File updated with new folder' 
+      });
+    } else {
+      // Create a new processed file entry
+      const newFile = {
+        _id: new mongoose.Types.ObjectId(),
+        originalName: highlightedFile.originalName,
+        highlightedVersion: highlightedFileId,
+        maskedVersion: maskedFileId,
+        processedAt: new Date(),
+        fileSize: highlightedFile.fileSize + maskedFile.fileSize,
+        fileType: highlightedFile.fileType,
+        folderId: folderId || null
+      };
+      
+      // Add the file to the user's processedFiles array
+      await UserModel.findByIdAndUpdate(
+        req.user._id,
+        { $push: { processedFiles: newFile } }
+      );
+      
+      res.status(201).json({ 
+        success: true, 
+        file: newFile,
+        message: 'File added to user collection'
+      });
+    }
   } catch (error) {
     console.error("Error saving processed files:", error);
     res.status(500).json({ error: "Error saving processed files" });

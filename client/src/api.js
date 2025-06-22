@@ -72,17 +72,24 @@ export const checkText = (text, token) => apiApi.post('/check-text', { text }, {
   headers: token ? { Authorization: `Bearer ${token}` } : {}
 });
 
-export const uploadFile = (formData, token) => apiApi.post('/upload-file', formData, {
-  headers: {
-    'Content-Type': 'multipart/form-data',
-    ...(token ? { Authorization: `Bearer ${token}` } : {})
+export const uploadFile = (formData, token, folderId) => {
+  // Append folderId to formData if provided
+  if (folderId) {
+    formData.append('folderId', folderId);
   }
-});
+  
+  return apiApi.post('/upload-file', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      ...(token ? { Authorization: `Bearer ${token}` } : {})
+    }
+  });
+};
 
 // Analytics endpoint
 export const getAnalytics = (token) => apiApi.get('/analytics', {
   headers: { Authorization: `Bearer ${token}` }
 });
 
-export const viewFile = (filename) => `http://localhost:9643/api/view/${filename}`;
-export const downloadFile = (filename) => `http://localhost:9643/api/download/${filename}`;
+export const viewFile = (fileId) => `http://localhost:9643/api/view/${fileId}`;
+export const downloadFile = (fileId) => `http://localhost:9643/api/download/${fileId}`;
