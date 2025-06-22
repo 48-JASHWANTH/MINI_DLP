@@ -1,0 +1,106 @@
+.not-found-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  background-color: #ffffff;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background shapes */
+.not-found-container::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -10%;
+  width: 50%;
+  height: 70%;
+  background-color: #f9e9dd;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.not-found-container::after {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 40%;
+  height: 60%;
+  background-color: #d5dbd2;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+/* Additional shape at the bottom */
+.not-found-container .bottom-shape {
+  position: absolute;
+  bottom: -30%;
+  right: -10%;
+  width: 80%;
+  height: 70%;
+  background-color: #e8edf1;
+  border-radius: 50%;
+  z-index: 0;
+}
+
+.not-found-content {
+  text-align: center;
+  z-index: 1;
+  max-width: 500px;
+  padding: 2rem;
+}
+
+.not-found-title {
+  font-size: 10rem;
+  font-weight: 500;
+  color: #2a2a2a;
+  margin: 0;
+  line-height: 1;
+}
+
+.not-found-subtitle {
+  font-size: 3rem;
+  font-weight: 500;
+  color: #2a2a2a;
+  margin: 0 0 2rem 0;
+}
+
+.not-found-text {
+  font-size: 1.5rem;
+  color: #4a4a4a;
+  margin-bottom: 3rem;
+  line-height: 1.6;
+}
+
+.not-found-button {
+  background-color: #e28f79;
+  color: white;
+  border: none;
+  border-radius: 2rem;
+  padding: 1rem 3rem;
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.not-found-button:hover {
+  background-color: #d27c66;
+}
+
+/* Make it responsive */
+@media (max-width: 768px) {
+  .not-found-title {
+    font-size: 6rem;
+  }
+  
+  .not-found-subtitle {
+    font-size: 2rem;
+  }
+  
+  .not-found-text {
+    font-size: 1.2rem;
+  }
+} 

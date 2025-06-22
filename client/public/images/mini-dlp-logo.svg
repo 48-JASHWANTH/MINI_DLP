@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <g>
+    <!-- Shield outline -->
+    <path fill="#1e3d5c" d="M256 40c130 0 216 46 216 46s-23 240-216 386C40 326 17 86 17 86s86-46 216-46z"/>
+    <path fill="#4d85b3" d="M256 70c110 0 180 36 180 36s-20 210-180 336C76 316 56 106 56 106s70-36 180-36z"/>
+    <path fill="#1e3d5c" d="M256 100c90 0 146 26 146 26s-16 180-146 286C110 306 94 126 94 126s56-26 146-26z"/>
+    
+    <!-- Lock -->
+    <circle fill="#4d85b3" cx="256" cy="230" r="70"/>
+    <path fill="#1e3d5c" d="M256 190c-22 0-40 18-40 40v30h80v-30c0-22-18-40-40-40z"/>
+    <rect fill="#1e3d5c" x="216" y="260" width="80" height="60" rx="10"/>
+    <circle fill="#1e3d5c" cx="256" cy="290" r="15"/>
+    <rect fill="#1e3d5c" x="251" y="290" width="10" height="20"/>
+    
+    <!-- Connection points -->
+    <circle fill="#4d85b3" cx="114" cy="180" r="10"/>
+    <circle fill="#4d85b3" cx="114" cy="230" r="10"/>
+    <circle fill="#4d85b3" cx="114" cy="280" r="10"/>
+    <circle fill="#4d85b3" cx="114" cy="330" r="10"/>
+    
+    <!-- Connection lines -->
+    <rect fill="#1e3d5c" x="114" y="180" width="40" height="6"/>
+    <rect fill="#1e3d5c" x="114" y="230" width="40" height="6"/>
+    <rect fill="#1e3d5c" x="114" y="280" width="40" height="6"/>
+    <rect fill="#1e3d5c" x="114" y="330" width="40" height="6"/>
+    
+    <!-- Text -->
+    <path fill="#1e3d5c" d="M130 430h15v50h-15zM130 430v50h15v-50zM160 430h15v50h-15zM160 430v50h15l15-25-15-25zM200 430h15v50h-15zM200 430v50h15v-50zM230 430h15v25h-15zM230 430v50h15v-25zM260 430h30v10h-30zM260 470h30v10h-30zM260 430v50h10v-20h10v-10h-10v-10h20v-10zM310 430h15v50h-15zM310 430v50h15v-50zM340 430h15v50h-15zM340 430v50h30v-10h-15v-40z"/>
+  </g>
+</svg> 
