@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './UserProfile.css';
 import { FaUser, FaEnvelope, FaPhone, FaCalendarAlt, FaMapMarkerAlt, FaCog, FaBuilding } from 'react-icons/fa';
+import { getUserProfile, updateUserProfile } from '../api';
 
 function UserProfile() {
   const [user, setUser] = useState(null);
@@ -31,11 +31,7 @@ function UserProfile() {
         return;
       }
 
-      const response = await axios.get('http://localhost:9643/user/profile', {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        }
-      });
+      const response = await getUserProfile(userInfo.token);
 
       setUser(response.data.user);
       setFormData({
@@ -66,11 +62,7 @@ function UserProfile() {
       setLoading(true);
       const userInfo = JSON.parse(localStorage.getItem('user-info'));
 
-      const response = await axios.put('http://localhost:9643/user/profile', formData, {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        }
-      });
+      const response = await updateUserProfile(userInfo.token, formData);
 
       setUser(response.data.user);
       setIsEditing(false);

@@ -1,6 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './ProcessedFiles.css';
+import { 
+  getUserFiles, 
+  getUserFolders, 
+  createUserFolder, 
+  deleteUserFile, 
+  moveUserFile,
+  bulkMoveUserFiles,
+  viewFile,
+  downloadFile
+} from '../api';
 
 function ProcessedFiles() {
   const [files, setFiles] = useState([]);
@@ -44,12 +53,7 @@ function ProcessedFiles() {
         return;
       }
 
-      const response = await axios.get('http://localhost:9643/user/files', {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        }
-      });
-
+      const response = await getUserFiles(userInfo.token);
       setFiles(response.data.files);
       setLoading(false);
     } catch (err) {
@@ -64,12 +68,7 @@ function ProcessedFiles() {
       const userInfo = JSON.parse(localStorage.getItem('user-info'));
       if (!userInfo) return;
 
-      const response = await axios.get('http://localhost:9643/user/folders', {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        }
-      });
-
+      const response = await getUserFolders(userInfo.token);
       setFolders(response.data.folders || []);
     } catch (err) {
       console.error('Error fetching folders:', err);
@@ -88,14 +87,7 @@ function ProcessedFiles() {
     try {
       const userInfo = JSON.parse(localStorage.getItem('user-info'));
       
-      const response = await axios.post('http://localhost:9643/user/folders', 
-        { name: newFolderName },
-        {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`
-          }
-        }
-      );
+      const response = await createUserFolder(userInfo.token, { name: newFolderName });
       
       setFolders([...folders, response.data.folder]);
       setSuccess('Folder created successfully');
@@ -115,11 +107,7 @@ function ProcessedFiles() {
     try {
       const userInfo = JSON.parse(localStorage.getItem('user-info'));
       
-      await axios.delete(`http://localhost:9643/user/files/${fileId}`, {
-        headers: {
-          Authorization: `Bearer ${userInfo.token}`
-        }
-      });
+      await deleteUserFile(userInfo.token, fileId);
       
       // Update files list after deletion
       setFiles(files.filter(file => file._id !== fileId));
@@ -140,11 +128,7 @@ function ProcessedFiles() {
       const userInfo = JSON.parse(localStorage.getItem('user-info'));
       
       for (const fileId of selectedFiles) {
-        await axios.delete(`http://localhost:9643/user/files/${fileId}`, {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`
-          }
-        });
+        await deleteUserFile(userInfo.token, fileId);
       }
       
       // Update files list after deletion
@@ -166,14 +150,7 @@ function ProcessedFiles() {
     try {
       const userInfo = JSON.parse(localStorage.getItem('user-info'));
       
-      await axios.put(`http://localhost:9643/user/files/${selectedFileId}/move`, 
-        { folderId: selectedFolderId },
-        {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`
-          }
-        }
-      );
+      await moveUserFile(userInfo.token, selectedFileId, selectedFolderId);
       
       // Update file in the local state
       const updatedFiles = files.map(file => 
@@ -199,17 +176,7 @@ function ProcessedFiles() {
     try {
       const userInfo = JSON.parse(localStorage.getItem('user-info'));
       
-      await axios.post(`http://localhost:9643/user/files/bulk-move`, 
-        { 
-          fileIds: selectedFiles,
-          folderId: selectedFolderId 
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`
-          }
-        }
-      );
+      await bulkMoveUserFiles(userInfo.token, selectedFiles, selectedFolderId);
       
       // Update files in the local state
       const updatedFiles = files.map(file => 
@@ -231,11 +198,11 @@ function ProcessedFiles() {
   };
 
   const handleViewFile = (fileId) => {
-    window.open(`http://localhost:9643/api/view/${fileId}`, '_blank');
+    window.open(viewFile(fileId), '_blank');
   };
 
   const handleDownloadFile = (fileId) => {
-    window.location.href = `http://localhost:9643/api/download/${fileId}`;
+    window.location.href = downloadFile(fileId);
   };
 
   const toggleFileSelection = (fileId) => {
