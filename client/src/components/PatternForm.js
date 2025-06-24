@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { addUserPattern } from '../api';
 import './PatternForm.css';
+import LoadingAnimation from './LoadingAnimation';
 
 function PatternForm({ onPatternAdded }) {
   const [name, setName] = useState('');
@@ -46,10 +47,9 @@ function PatternForm({ onPatternAdded }) {
   };
 
   return (
-    <div className="pattern-form-card">
-      <h2 className="card-title">
-        <i className="fas fa-plus-circle"></i> Add New Pattern
-      </h2>
+    <div className="pattern-form-container">
+      {loading && <LoadingAnimation message="Saving pattern..." />}
+      <h2 className="section-title"><i className="fas fa-plus-circle"></i> Create New Pattern</h2>
       
       {error && <div className="error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
       {success && <div className="success-message"><i className="fas fa-check-circle"></i> {success}</div>}

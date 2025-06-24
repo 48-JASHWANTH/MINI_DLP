@@ -10,6 +10,7 @@ import {
   viewFile,
   downloadFile
 } from '../api';
+import LoadingAnimation from './LoadingAnimation';
 
 function ProcessedFiles() {
   const [files, setFiles] = useState([]);
@@ -408,14 +409,7 @@ function ProcessedFiles() {
   };
 
   if (loading) {
-    return (
-      <div className="processed-files-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p>Loading files...</p>
-        </div>
-      </div>
-    );
+    return <LoadingAnimation message="Loading processed files..." />;
   }
 
   const visibleFiles = getVisibleFiles();

@@ -6,6 +6,7 @@ import PageNotFound from "./components/PageNotFound";
 import RefreshHandler from "./components/RefreshHandler";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import Layout from "./components/Layout";
+import LoadingAnimation from "./components/LoadingAnimation";
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -35,8 +36,7 @@ function App() {
   
   const PrivateRoute = ({ element }) => {
     if (isLoading) {
-      // You could add a loading spinner here
-      return <div className="loading-app">Loading...</div>;
+      return <LoadingAnimation message="Initializing MINI-DLP..." />;
     }
     return isAuthenticated ? element : <Navigate to="/login" />;
   };

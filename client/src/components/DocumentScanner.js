@@ -9,6 +9,7 @@ import {
   saveProcessedFiles 
 } from '../api';
 import './DocumentScanner.css';
+import LoadingAnimation from './LoadingAnimation';
 
 function DocumentScanner() {
   const [document, setDocument] = useState('');
@@ -23,8 +24,17 @@ function DocumentScanner() {
   const [selectedFolderId, setSelectedFolderId] = useState('');
   const [showNewFolderForm, setShowNewFolderForm] = useState(false);
   const [newFolderName, setNewFolderName] = useState('');
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
+    // Check if device is mobile
+    const checkMobile = () => {
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+      setIsMobile(mobile);
+    };
+    
+    checkMobile();
+    
     // Fetch folders when confirmation dialog is shown
     if (showFileSaveConfirm) {
       fetchUserFolders();
@@ -96,7 +106,13 @@ function DocumentScanner() {
   };
 
   const handleFileUpload = async (e) => {
+    e.preventDefault(); // Prevent default browser behavior
     const file = e.target.files[0];
+    
+    if (!file) {
+      return; // No file selected
+    }
+    
     const allowedTypes = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -104,7 +120,18 @@ function DocumentScanner() {
       'text/plain'
     ];
     
-    if (file && allowedTypes.includes(file.type)) {
+    // Check for mobile devices that might have different MIME types
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isAllowedMobileType = isMobileDevice && (
+      file.type.includes('pdf') || 
+      file.type.includes('word') || 
+      file.type.includes('sheet') || 
+      file.type.includes('excel') ||
+      file.type.includes('text') ||
+      file.name.match(/\.(pdf|docx|xlsx|txt)$/i)
+    );
+    
+    if (file && (allowedTypes.includes(file.type) || isAllowedMobileType)) {
       setFileName(file.name);
       const formData = new FormData();
       formData.append('file', file);
@@ -203,6 +230,7 @@ function DocumentScanner() {
 
   return (
     <div className="scanner-container">
+      {isLoading && <LoadingAnimation message="Scanning document..." />}
       <div className="scanner-card">
         <h2 className="scanner-title"><i className="fas fa-search"></i> DOCUMENT<br/>SCANNER</h2>
         
@@ -219,12 +247,22 @@ function DocumentScanner() {
                   className="file-input"
                   id="file-upload"
                   disabled={isLoading}
+                  capture="environment"
                 />
                 <label htmlFor="file-upload" className={`file-upload-label ${isLoading ? 'disabled' : ''}`}>
                   <i className="fas fa-file-upload"></i>
-                  {fileName ? fileName : 'Drop your file here or click to upload'}
+                  {fileName ? fileName : 'Drop your file here or tap to upload'}
                 </label>
               </div>
+              {isMobile && (
+                <button 
+                  onClick={() => document.getElementById('file-upload').click()}
+                  className="mobile-upload-button"
+                  disabled={isLoading}
+                >
+                  <i className="fas fa-upload"></i> Select File
+                </button>
+              )}
             </div>
 
             <div className="text-section">
@@ -243,13 +281,6 @@ function DocumentScanner() {
                 {isLoading ? <><i className="fas fa-spinner fa-spin"></i> Scanning...</> : <><i className="fas fa-search"></i> Scan</>}
               </button>
             </div>
-
-            {isLoading && (
-              <div className="loading-spinner">
-                <div className="spinner"></div>
-                <p><i className="fas fa-spinner fa-spin"></i> Processing...</p>
-              </div>
-            )}
           </div>
           
           <div className="scanner-right">

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getAnalytics } from '../api';
 import './Dashboard.css';
+import LoadingAnimation from './LoadingAnimation';
 
 const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
@@ -62,12 +63,7 @@ const Dashboard = () => {
   };
 
   if (loading) {
-    return (
-      <div className="dashboard-container loading">
-        <div className="loading-spinner"></div>
-        <p>Loading analytics...</p>
-      </div>
-    );
+    return <LoadingAnimation message="Loading analytics..." />;
   }
 
   if (error) {

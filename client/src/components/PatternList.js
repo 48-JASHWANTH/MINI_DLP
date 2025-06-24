@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { getUserPatterns, deleteUserPattern } from '../api';
 import './PatternList.css';
+import LoadingAnimation from './LoadingAnimation';
 
 function PatternList({ refreshTrigger }) {
   const [customPatterns, setCustomPatterns] = useState([]);
@@ -65,14 +66,7 @@ function PatternList({ refreshTrigger }) {
   };
 
   if (loading && !customPatterns.length) {
-    return (
-      <div className="pattern-list-container">
-        <div className="loading-spinner">
-          <div className="spinner"></div>
-          <p><i className="fas fa-spinner fa-spin"></i> Loading patterns...</p>
-        </div>
-      </div>
-    );
+    return <LoadingAnimation message="Loading patterns..." />;
   }
 
   return (

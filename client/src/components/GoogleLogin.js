@@ -3,6 +3,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { googleAuth } from "../api";
 import { useNavigate } from 'react-router-dom';
 import "./GoogleLogin.css";
+import LoadingAnimation from './LoadingAnimation';
 
 function GoogleLogin() {
   const navigate = useNavigate();
@@ -119,12 +120,7 @@ function GoogleLogin() {
           <span className="btn-text">Sign in with Google</span>
         </button>
         
-        {isLoading && (
-          <div className="loading-spinner">
-            <div className="spinner"></div>
-            <p>Authenticating...</p>
-          </div>
-        )}
+        {isLoading && <LoadingAnimation message="Authenticating..." />}
         
         {error && <p className="error-message">{error}</p>}
       </div>
