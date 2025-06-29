@@ -89,12 +89,14 @@
 }
 
 .file-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-gap: 15px;
+  width: 100%;
+  box-sizing: border-box;
   background-color: rgba(76, 214, 255, 0.05);
   border-radius: 8px;
   padding: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
   border-left: 3px solid #4CD6FF;
   box-shadow: 0 0 10px rgba(76, 214, 255, 0.1);
 }
@@ -530,27 +532,26 @@
   background-color: rgba(255, 255, 255, 0.1);
 }
 
-/* Responsive adjustments for file items */
-.file-item {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  grid-gap: 15px;
-}
-
 /* Additional responsive adjustments */
 @media (max-width: 768px) {
   .folders-list {
     flex-direction: column;
+    width: 100%;
   }
   
   .folder-item {
     flex: 1 0 100%;
+    width: 100%;
+    margin-bottom: 10px;
+    box-sizing: border-box;
   }
   
   .bulk-action-toolbar {
     flex-direction: column;
     gap: 15px;
     align-items: flex-start;
+    width: 100%;
+    box-sizing: border-box;
   }
   
   .bulk-actions {
@@ -563,6 +564,8 @@
     grid-template-areas: 
       "checkbox info"
       "actions actions";
+    width: 100%;
+    overflow-x: hidden;
   }
   
   .file-selection {
@@ -571,11 +574,27 @@
   
   .file-info {
     grid-area: info;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
   }
   
   .file-actions {
     grid-area: actions;
     margin-top: 10px;
+    width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  /* Make action buttons responsive */
+  .file-actions button {
+    flex: 1;
+    min-width: 80px;
+    padding: 8px;
+    font-size: 14px;
   }
 }
 
@@ -583,15 +602,45 @@
   .modal-content {
     padding: 15px;
     width: 90%;
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .new-folder-form {
     flex-direction: column;
     align-items: stretch;
+    width: 100%;
   }
   
   .new-folder-form button {
     margin-top: 10px;
+    width: 100%;
+  }
+
+  .new-folder-form input {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  /* Adjust search and filter container for mobile */
+  .search-filter-container {
+    flex-direction: column;
+  }
+
+  .filter-box {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  /* Fix file info display on small screens */
+  .file-info {
+    font-size: 14px;
+  }
+
+  /* Make breadcrumbs responsive */
+  .breadcrumb {
+    flex-wrap: wrap;
+    padding: 8px;
   }
 }
 
@@ -604,6 +653,9 @@
   background-color: rgba(76, 214, 255, 0.05);
   border-radius: 5px;
   border-left: 3px solid #4CD6FF;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
 }
 
 .breadcrumb-home {
@@ -632,10 +684,12 @@
   gap: 15px;
   margin-bottom: 20px;
   width: 100%;
+  box-sizing: border-box;
 }
 
 .search-box {
   flex: 1;
+  min-width: 0; /* Allow shrinking below content size */
 }
 
 .search-box input {
@@ -646,6 +700,7 @@
   border-radius: 5px;
   color: #fff;
   outline: none;
+  box-sizing: border-box;
 }
 
 .search-box input:focus {
@@ -655,6 +710,8 @@
 
 .filter-box {
   width: 150px;
+  min-width: 120px; /* Ensure minimum width */
+  box-sizing: border-box;
 }
 
 .filter-box select {

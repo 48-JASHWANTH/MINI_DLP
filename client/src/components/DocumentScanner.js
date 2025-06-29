@@ -317,26 +317,29 @@ function DocumentScanner() {
         
         {/* Processed Files Section */}
         {processedFiles && (
-          <div className="processed-files">
-            <h4><i className="fas fa-file-alt"></i> Processed Files</h4>
-            <div className="file-actions">
-              <div className="file-action-group">
-                <h5><i className="fas fa-highlighter"></i> Highlighted File</h5>
-                <div>
-                  <button onClick={() => handleView(processedFiles.highlighted)}><i className="fas fa-eye"></i> View</button>
-                  <button onClick={() => handleDownload(processedFiles.highlighted)}><i className="fas fa-download"></i> Download</button>
+          <>
+            <div className="section-separator"></div>
+            <div className="processed-files">
+              <h4><i className="fas fa-file-alt"></i> Processed Files</h4>
+              <div className="file-actions">
+                <div className="file-action-group">
+                  <h5><i className="fas fa-highlighter"></i> Highlighted File</h5>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button onClick={() => handleView(processedFiles.highlighted)}><i className="fas fa-eye"></i> View</button>
+                    <button onClick={() => handleDownload(processedFiles.highlighted)}><i className="fas fa-download"></i> Download</button>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="file-action-group">
-                <h5><i className="fas fa-mask"></i> Masked File</h5>
-                <div>
-                  <button onClick={() => handleView(processedFiles.masked)}><i className="fas fa-eye"></i> View</button>
-                  <button onClick={() => handleDownload(processedFiles.masked)}><i className="fas fa-download"></i> Download</button>
+                
+                <div className="file-action-group">
+                  <h5><i className="fas fa-mask"></i> Masked File</h5>
+                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                    <button onClick={() => handleView(processedFiles.masked)}><i className="fas fa-eye"></i> View</button>
+                    <button onClick={() => handleDownload(processedFiles.masked)}><i className="fas fa-download"></i> Download</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
+          </>
         )}
         
         {/* Confirmation Dialog with Folder Selection */}
