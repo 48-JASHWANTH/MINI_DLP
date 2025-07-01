@@ -160,6 +160,16 @@ function UserProfile() {
               </div>
             </div>
             
+            <div className="profile-field">
+              <div className="field-icon">
+                <FaBuilding />
+              </div>
+              <div className="field-value">
+                <h3>Organization</h3>
+                <p>{user?.organization || 'Not provided'}</p>
+              </div>
+            </div>
+            
             <button className="edit-button" onClick={() => setIsEditing(true)}>
               Edit Profile
             </button>

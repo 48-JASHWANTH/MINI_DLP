@@ -417,7 +417,9 @@ function ProcessedFiles() {
   return (
     <div className="processed-files-container">
       <div className="processed-files-card">
-        <h2 className="processed-files-title">Processed Files</h2>
+        <div className="processed-files-header">
+          <h2 className="processed-files-title">Processed Files</h2>
+        </div>
 
         {success && <div className="success-message">{success}</div>}
         {error && <div className="error-message">{error}</div>}

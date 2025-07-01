@@ -73,23 +73,17 @@
 }
 
 .btn-primary {
-  background-color: #2196f3;
-  color: white;
-  padding: 1rem 1.5rem;
-  border: none;
-  border-radius: 8px;
+  background-color: rgba(0, 0, 0, 0.2);
+  color: #00e1ff;
+  border: 2px solid #00e1ff;
+  padding: 0.75rem 1rem;
+  border-radius: 4px;
+  transition: all 0.2s;
   cursor: pointer;
-  width: 100%;
-  font-size: 1rem;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  margin-top: 1rem;
 }
 
 .btn-primary:hover {
-  background-color: #1976d2;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+  background-color: rgba(0, 225, 255, 0.1);
 }
 
 .btn-primary:active {
@@ -251,14 +245,14 @@
 }
 
 .form-group input[type="text"]:focus {
-  border-color: #00e1ff;
-  box-shadow: 0 0 0 3px rgba(0, 225, 255, 0.2);
   outline: none;
+  border-color: #00e1ff;
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .pattern-form-card.dark .form-group input[type="text"]:focus {
   border-color: #00e1ff;
-  box-shadow: 0 0 0 3px rgba(0, 225, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 .btn {
@@ -273,17 +267,6 @@
 
 .btn:active {
   transform: translateY(1px);
-}
-
-.btn-primary {
-  background-color: rgba(0, 0, 0, 0.2);
-  color: #00e1ff;
-  border: 1px solid #00e1ff;
-}
-
-.btn-primary:hover {
-  background-color: rgba(0, 225, 255, 0.1);
-  box-shadow: 0 0 10px rgba(0, 225, 255, 0.4);
 }
 
 .btn-primary:disabled {

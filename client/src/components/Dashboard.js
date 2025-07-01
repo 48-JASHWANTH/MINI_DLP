@@ -52,13 +52,13 @@ const Dashboard = () => {
   const getRiskColor = (riskLevel) => {
     switch (riskLevel) {
       case 'High':
-        return '#e74c3c';
+        return 'var(--accent-danger)';
       case 'Medium':
-        return '#f39c12';
+        return 'var(--accent-warning)';
       case 'Low':
-        return '#2ecc71';
+        return 'var(--accent-success)';
       default:
-        return '#3498db';
+        return 'var(--accent-info)';
     }
   };
 
@@ -159,7 +159,7 @@ const Dashboard = () => {
                 {fileTypeLabels.map((label, index) => (
                   <div className="bar-group" key={label}>
                     <div 
-                      className="bar" 
+                      className="barr" 
                       style={{ 
                         height: `${(fileTypeCounts[index] / Math.max(...fileTypeCounts)) * 100}%` 
                       }}
@@ -186,7 +186,7 @@ const Dashboard = () => {
                 {monthLabels.map((label, index) => (
                   <div className="bar-group" key={label}>
                     <div 
-                      className="bar" 
+                      className="barr" 
                       style={{ 
                         height: `${(monthCounts[index] / Math.max(...monthCounts)) * 100}%` 
                       }}
@@ -216,10 +216,10 @@ const Dashboard = () => {
                 {riskLabels.map((label, index) => (
                   <div className="bar-group" key={label}>
                     <div 
-                      className="bar" 
+                      className="barr" 
                       style={{ 
                         height: `${(riskCounts[index] / Math.max(...riskCounts)) * 100}%`,
-                        backgroundColor: getRiskColor(label)
+                        background: getRiskColor(label)
                       }}
                     >
                       <span className="bar-value">{riskCounts[index]}</span>
@@ -234,6 +234,14 @@ const Dashboard = () => {
               </div>
             )}
           </div>
+          <div className="risk-legend">
+            {riskLabels.map(label => (
+              <div className="risk-legend-item" key={label}>
+                <div className="risk-legend-color" style={{ backgroundColor: getRiskColor(label) }}></div>
+                <div className="risk-legend-label">{label}</div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* Top Detected Patterns */}
@@ -245,7 +253,7 @@ const Dashboard = () => {
                 {patternLabels.map((label, index) => (
                   <div className="bar-group" key={label}>
                     <div 
-                      className="bar" 
+                      className="barr" 
                       style={{ 
                         height: `${(patternCounts[index] / Math.max(...patternCounts)) * 100}%` 
                       }}

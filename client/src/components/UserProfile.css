@@ -14,12 +14,11 @@
 .profile-card {
   background-color: rgba(10, 22, 38, 0.9);
   border-radius: 10px;
-  box-shadow: 0 4px 25px rgba(76, 214, 255, 0.2);
   padding: 2.5rem;
   width: 100%;
-  max-width: 700px;
+  max-width: 1000px;
   margin: 0 auto;
-  border: 1px solid rgba(76, 214, 255, 0.3);
+  border: 1px solid #333;
   box-sizing: border-box; /* Ensure padding is included in width */
 }
 
@@ -28,25 +27,12 @@
   overflow: hidden;
 }
 
-.glow-card::before {
-  content: '';
-  position: absolute;
-  top: -2px;
-  left: -2px;
-  right: -2px;
-  bottom: -2px;
-  border-radius: 12px;
-  background: linear-gradient(45deg, rgba(76, 214, 255, 0.3), transparent, rgba(76, 214, 255, 0.3));
-  z-index: -1;
-  pointer-events: none;
-}
-
 .profile-header-title {
   display: flex;
   align-items: center;
   margin-bottom: 2.5rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgba(76, 214, 255, 0.2);
+  border-bottom: 1px solid #333;
 }
 
 .large-icon {
@@ -61,7 +47,6 @@
   font-size: 2.5rem;
   font-weight: 600;
   letter-spacing: 2px;
-  text-shadow: 0 0 10px rgba(76, 214, 255, 0.5);
 }
 
 .profile-details {
@@ -83,7 +68,7 @@
 }
 
 .profile-field:hover {
-  box-shadow: 0 4px 12px rgba(76, 214, 255, 0.15);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
   transform: translateY(-2px);
   background-color: rgba(0, 10, 20, 0.7);
 }

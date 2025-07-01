@@ -232,7 +232,9 @@ function DocumentScanner() {
     <div className="scanner-container">
       {isLoading && <LoadingAnimation message="Scanning document..." />}
       <div className="scanner-card">
-        <h2 className="scanner-title"><i className="fas fa-search"></i> DOCUMENT<br/>SCANNER</h2>
+        <div className="scanner-header">
+          <h2 className="scanner-title"><i className="fas fa-search"></i> DOCUMENT SCANNER</h2>
+        </div>
         
         {error && <div className="error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
         

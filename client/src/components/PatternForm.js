@@ -6,7 +6,6 @@ import LoadingAnimation from './LoadingAnimation';
 function PatternForm({ onPatternAdded }) {
   const [name, setName] = useState('');
   const [pattern, setPattern] = useState('');
-  const [requiresValidation, setRequiresValidation] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
@@ -26,13 +25,12 @@ function PatternForm({ onPatternAdded }) {
       await addUserPattern(userInfo.token, { 
         name, 
         pattern,
-        requiresValidation 
+        requiresValidation: true // Always set to true by default
       });
       
       setSuccess('Pattern saved successfully!');
       setName('');
       setPattern('');
-      setRequiresValidation(false);
       
       // Notify parent component to refresh pattern list
       if (onPatternAdded) {
@@ -77,20 +75,7 @@ function PatternForm({ onPatternAdded }) {
             disabled={loading}
             placeholder="e.g., \d{4}-\d{4}-\d{4}-\d{4}"
           />
-          <p className="hint"><i className="fas fa-info-circle"></i> Use regular expressions to define your pattern</p>
-        </div>
-        
-        <div className="form-group checkbox-group">
-          <label className="checkbox-label">
-            <input 
-              type="checkbox" 
-              checked={requiresValidation} 
-              onChange={(e) => setRequiresValidation(e.target.checked)} 
-              disabled={loading}
-            />
-            <i className="fas fa-check-square"></i> Requires Validation
-          </label>
-          <p className="hint"><i className="fas fa-info-circle"></i> Enable to apply validation checks for this pattern type</p>
+          <p className="hint"><i className="fas fa-info-circle"></i> Use regular expressions to define your pattern. Validation will be automatically applied.</p>
         </div>
         
         <button 
