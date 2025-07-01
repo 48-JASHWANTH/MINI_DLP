@@ -3,8 +3,6 @@
 ## Overview
 MINI-DLP is a comprehensive Data Loss Prevention (DLP) tool designed to protect sensitive information from unauthorized access and leakage. It scans various document types for sensitive data patterns such as PII (Personally Identifiable Information), financial data, and custom patterns defined by users.
 
-![MINI-DLP Logo](client/public/images/mini-dlp-logo-exact.svg)
-
 ## Features
 
 - **Secure Authentication**: Google OAuth 2.0 integration for secure user authentication
@@ -135,18 +133,3 @@ The project consists of two main components:
 - OAuth 2.0 implementation ensures secure authentication
 - JWT token-based authentication for API endpoints
 - Files are stored securely in MongoDB with user-specific access control
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## Acknowledgements
-
-- [PDF-Parse](https://www.npmjs.com/package/pdf-parse) for PDF text extraction
-- [Mammoth](https://www.npmjs.com/package/mammoth) for DOCX processing
-- [SheetJS](https://www.npmjs.com/package/xlsx) for Excel file handling
-- [PDF-Lib](https://www.npmjs.com/package/pdf-lib) for PDF generation and manipulation
