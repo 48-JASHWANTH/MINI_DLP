@@ -1,0 +1,120 @@
+.about-container {
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+  background-color: var(--dashboard-bg);
+  min-height: 100vh;
+  transition: background-color 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.about-card {
+  background: var(--card-bg);
+  border-radius: 12px;
+  box-shadow: var(--shadow-md);
+  width: 100%;
+  max-width: 800px;
+  margin: 20px auto;
+  overflow: hidden;
+  border: 1px solid var(--card-border);
+  transition: all 0.3s ease;
+}
+
+.about-card:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-lg);
+}
+
+.about-header {
+  padding: 20px;
+  border-bottom: 1px solid var(--card-border);
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+}
+
+.about-title {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+}
+
+.about-title i {
+  margin-right: 10px;
+}
+
+.about-content {
+  padding: 25px;
+}
+
+.about-description {
+  color: var(--text-primary);
+  line-height: 1.8;
+  font-size: 1.05rem;
+  margin-bottom: 30px;
+  text-align: justify;
+}
+
+.about-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+.about-link {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.about-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  filter: brightness(1.05);
+}
+
+.about-link i {
+  margin-right: 8px;
+  font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+  .about-card {
+    margin: 10px;
+  }
+  
+  .about-title {
+    font-size: 1.3rem;
+  }
+  
+  .about-description {
+    font-size: 0.95rem;
+  }
+  
+  .about-links {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .about-link {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
