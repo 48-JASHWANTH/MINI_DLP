@@ -10,8 +10,16 @@ const { Document, Paragraph, TextRun } = docx;
 const FileModel = require("../models/fileModel");
 const UserModel = require("../models/userModel");
 const mongoose = require("mongoose");
-const { Groq } = require("groq");
+const OpenAI = require("openai");
 const pdfParse = require('pdf-parse');
+const axios = require('axios');
+
+// Set to false to enable real API calls
+const MOCK_MODE = false;
+
+// Groq API configuration
+const GROQ_API_BASE_URL = 'https://api.groq.com/openai/v1';
+const GROQ_MODEL = 'llama3-70b-8192';
 
 exports.checkText = async (req, res) => {
   const { text } = req.body;
@@ -874,87 +882,153 @@ exports.downloadFile = async (req, res) => {
 };
 
 exports.talkToPdf = async (req, res) => {
+  console.log('[talkToPdf] Request received:', req.path, req.method);
+  console.log('[talkToPdf] Request body:', req.body);
+  
   try {
-    const { fileId, question } = req.body;
+    const { fileName, question } = req.body;
 
-    if (!fileId || !question) {
+    if (!fileName || !question) {
+      console.log('[talkToPdf] Missing required parameters:', { fileName, question });
       return res.status(400).json({
         success: false,
-        message: "File ID and question are required"
+        message: "File name and question are required"
       });
     }
 
-    // Find the file in the database
-    const file = await FileModel.findById(fileId);
+    // Find the file in the database by originalName
+    console.log('[talkToPdf] Finding file with name:', fileName);
+    const file = await FileModel.findOne({ originalName: fileName });
+    console.log('[talkToPdf] File found:', file ? file._id : 'Not found');
+    
     if (!file) {
+      console.log('[talkToPdf] File not found:', fileName);
       return res.status(404).json({
         success: false,
         message: "File not found"
       });
     }
 
+    console.log('[talkToPdf] File found:', file._id, file.originalName);
+
     // Check if file is a PDF
     if (file.fileType !== '.pdf') {
+      console.log('[talkToPdf] File is not a PDF:', file.fileType);
       return res.status(400).json({
         success: false,
         message: "Selected file is not a PDF"
       });
     }
 
-    // Get file path
-    const filePath = path.join(__dirname, '..', file.filePath);
-
-    // Check if file exists
-    if (!fs.existsSync(filePath)) {
+    // Get file data directly from database
+    const dataBuffer = file.fileData;
+    
+    if (!dataBuffer || dataBuffer.length === 0) {
+      console.log('[talkToPdf] File data not found');
       return res.status(404).json({
         success: false,
-        message: "File not found on server"
+        message: "File data not found"
       });
     }
-
-    // Read the PDF file
-    const dataBuffer = fs.readFileSync(filePath);
+    
+    console.log('[talkToPdf] File data loaded, size:', dataBuffer.length);
     
     // Parse PDF to extract text
-    const pdfData = await pdfParse(dataBuffer);
-    const pdfText = pdfData.text;
+    console.log('[talkToPdf] Parsing PDF text');
+    
+    // Ensure we have a proper buffer
+    const pdfBuffer = Buffer.isBuffer(dataBuffer) ? dataBuffer : Buffer.from(dataBuffer);
+    
+    try {
+      const pdfData = await pdfParse(pdfBuffer);
+      const pdfText = pdfData.text;
+      console.log('[talkToPdf] PDF text extracted, length:', pdfText.length);
+      
+      // If in MOCK_MODE, return a response that includes some of the actual PDF content
+      if (MOCK_MODE) {
+        console.log('[talkToPdf] Using MOCK_MODE, returning response with actual PDF content');
+        
+        // Extract a preview of the PDF text (first 500 characters)
+        const contentPreview = pdfText.substring(0, 500) + (pdfText.length > 500 ? '...' : '');
+        
+        return res.status(200).json({
+          success: true,
+          answer: `Based on the content of "${fileName}", I can provide this answer to your question "${question}":\n\n` +
+                  `This is a simulated AI response, but I can tell you the document contains content like:\n\n` +
+                  `"${contentPreview}"\n\n` +
+                  `In a production environment with an API key configured, you would receive a more detailed answer based on the full content.`
+        });
+      }
+      
+      // Get the API key
+      const groqApiKey = process.env.GROQ_API_KEY;
+      if (!groqApiKey) {
+        console.log('[talkToPdf] Missing GROQ_API_KEY');
+        return res.status(200).json({
+          success: true,
+          answer: `No Groq API key is configured, but I can tell you the document "${fileName}" contains:\n\n` +
+                 `"${pdfText.substring(0, 300)}..."\n\n` +
+                 `Your question was: "${question}". Please configure a Groq API key for detailed answers.`
+        });
+      }
 
-    // Initialize Groq client with API key
-    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+      try {
+        // Call Groq API directly using axios
+        console.log('[talkToPdf] Calling Groq API');
+        
+        const response = await axios.post(
+          `${GROQ_API_BASE_URL}/chat/completions`,
+          {
+            model: GROQ_MODEL,
+            messages: [
+              { 
+                role: "system", 
+                content: "You are a helpful AI assistant that answers questions based on the provided PDF document content. Stick to information found in the document and indicate when you don't have enough information to answer accurately." 
+              },
+              { 
+                role: "user", 
+                content: `Document content: ${pdfText}\n\nQuestion: ${question}` 
+              }
+            ],
+            max_tokens: 1024
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${groqApiKey}`,
+              'Content-Type': 'application/json'
+            }
+          }
+        );
+        
+        // Get the answer from the response
+        const answer = response.data.choices[0].message.content;
+        console.log('[talkToPdf] Got answer from Groq, length:', answer.length);
 
-    if (!process.env.GROQ_API_KEY) {
-      return res.status(500).json({
+        return res.status(200).json({
+          success: true,
+          answer
+        });
+      } catch (apiError) {
+        console.error('[talkToPdf] Groq API error:', apiError.response ? apiError.response.data : apiError.message);
+        
+        // If there's an issue with the API, provide a response with PDF content
+        return res.status(200).json({
+          success: true,
+          answer: `I encountered an error while querying Groq for an answer about "${fileName}". ` +
+                  `However, I can tell you the document contains:\n\n` +
+                  `"${pdfText.substring(0, 300)}..."\n\n` +
+                  `Your question was: "${question}". Please try again later.`
+        });
+      }
+    } catch (pdfError) {
+      console.error('[talkToPdf] PDF parsing error:', pdfError);
+      return res.status(400).json({
         success: false,
-        message: "Groq API key not configured"
+        message: "Could not parse the PDF content. The file may be corrupted or password-protected."
       });
     }
-
-    // Send request to Groq API
-    const completion = await groq.chat.completions.create({
-      messages: [
-        { 
-          role: "system", 
-          content: "You are a helpful AI assistant that answers questions based on the provided PDF document content. Stick to information found in the document and indicate when you don't have enough information to answer accurately." 
-        },
-        { 
-          role: "user", 
-          content: `Document content: ${pdfText}\n\nQuestion: ${question}` 
-        }
-      ],
-      model: "llama3-70b-8192",
-    });
-
-    // Get response from Groq
-    const answer = completion.choices[0].message.content;
-
-    // Return the answer to the client
-    return res.status(200).json({
-      success: true,
-      answer
-    });
-
   } catch (error) {
-    console.error("Error in talkToPdf:", error);
+    console.error("[talkToPdf] Error:", error);
     return res.status(500).json({
       success: false,
       message: error.message || "An error occurred while processing the PDF query",

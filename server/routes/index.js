@@ -27,6 +27,12 @@ const optionalAuth = (req, res, next) => {
   });
 };
 
+// Test route to debug API issues
+router.get('/test-route', (req, res) => {
+  console.log('Test route hit!');
+  res.json({ message: 'Test route working!' });
+});
+
 // Pattern routes (with optional auth)
 router.get('/patterns', optionalAuth, patternController.getPatterns);
 router.post('/patterns', optionalAuth, patternController.addPattern);
@@ -36,8 +42,7 @@ router.delete('/patterns/:index', optionalAuth, patternController.deletePattern)
 router.post('/check-text', optionalAuth, documentController.checkText);
 router.post('/upload-file', optionalAuth, upload.single('file'), documentController.processFile);
 router.post('/save-processed-files', authMiddleware, documentController.saveProcessedFiles);
-var resi = router.post('/talk-to-pdf', authMiddleware, documentController.talkToPdf);
-console.log(resi)
+router.post('/talk-to-pdf', authMiddleware, documentController.talkToPdf);
 router.get('/view/:fileId', documentController.viewFile);
 router.get('/download/:fileId', documentController.downloadFile);
 router.get('/analytics', authMiddleware, documentController.getAnalytics); // Analytics requires authentication

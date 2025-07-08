@@ -12,6 +12,7 @@ function TalkToPDF() {
   const [loadingFiles, setLoadingFiles] = useState(true);
   const [error, setError] = useState(null);
   const chatEndRef = useRef(null);
+  const inputRef = useRef(null);
 
   useEffect(() => {
     fetchUserFiles();
@@ -40,6 +41,7 @@ function TalkToPDF() {
       const pdfFiles = response.data.files.filter(file => 
         file.fileType === '.pdf'
       );
+      console.log(pdfFiles)
       setFiles(pdfFiles);
       setLoadingFiles(false);
     } catch (err) {
@@ -53,6 +55,8 @@ function TalkToPDF() {
     setSelectedFile(file);
     // Clear chat history when switching files
     setChatHistory([]);
+    // Focus on input field after file selection
+    setTimeout(() => inputRef.current?.focus(), 300);
   };
 
   const handleQuestionChange = (e) => {
@@ -75,7 +79,7 @@ function TalkToPDF() {
       setQuestion('');
 
       // Call API to get answer
-      const response = await askPdfQuestion(userInfo.token, selectedFile._id, question);
+      const response = await askPdfQuestion(userInfo.token, selectedFile.originalName, question);
       
       // Add AI response to chat history
       const aiMessage = { role: 'assistant', content: response.data.answer };
@@ -93,6 +97,24 @@ function TalkToPDF() {
     }
   };
 
+  // Format message content to handle code blocks and links
+  const formatMessageContent = (content) => {
+    if (!content) return '';
+    
+    // Replace URLs with clickable links
+    const urlPattern = /https?:\/\/[^\s]+/g;
+    const textWithLinks = content.replace(urlPattern, (url) => 
+      `<a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`
+    );
+    
+    // Format code blocks
+    const formattedText = textWithLinks
+      .replace(/```([\s\S]*?)```/g, '<pre>$1</pre>')  // Code blocks
+      .replace(/`([^`]+)`/g, '<code>$1</code>');      // Inline code
+    
+    return <div dangerouslySetInnerHTML={{ __html: formattedText }} />;
+  };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -100,6 +122,16 @@ function TalkToPDF() {
       month: 'short',
       day: 'numeric',
     });
+  };
+  
+  const formatFileSize = (bytes) => {
+    if (!bytes) return 'Unknown size';
+    const kb = bytes / 1024;
+    if (kb < 1024) {
+      return `${Math.round(kb)} KB`;
+    }
+    const mb = kb / 1024;
+    return `${Math.round(mb * 10) / 10} MB`;
   };
 
   return (
@@ -115,7 +147,10 @@ function TalkToPDF() {
           {loadingFiles ? (
             <LoadingAnimation message="Loading PDFs..." />
           ) : files.length === 0 ? (
-            <p className="no-files-message">No PDF files found. Please upload PDFs first.</p>
+            <div className="no-files-message">
+              <span className="file-icon">📂</span>
+              <p>No PDF files found. Please upload PDFs first.</p>
+            </div>
           ) : (
             <div className="file-list">
               {files.map(file => (
@@ -126,9 +161,10 @@ function TalkToPDF() {
                 >
                   <div className="file-icon">📄</div>
                   <div className="file-details">
-                    <div className="file-name">{file.originalName}</div>
+                    <div className="file-name" title={file.originalName}>{file.originalName}</div>
                     <div className="file-info">
                       <span className="file-date">{formatDate(file.createdAt)}</span>
+                      <span className="file-size">{formatFileSize(file.fileSize)}</span>
                     </div>
                   </div>
                 </div>
@@ -141,7 +177,7 @@ function TalkToPDF() {
           {selectedFile ? (
             <>
               <div className="selected-file-header">
-                <h2>Chatting with: {selectedFile.originalName}</h2>
+                <h2 title={selectedFile.originalName}>Chatting with: {selectedFile.originalName}</h2>
               </div>
               
               <div className="chat-messages">
@@ -153,16 +189,32 @@ function TalkToPDF() {
                 
                 {chatHistory.map((message, index) => (
                   <div key={index} className={`chat-message ${message.role}`}>
-                    <div className="message-content">{message.content}</div>
+                    {message.role === 'user' && (
+                      <div className="message-avatar user-avatar">You</div>
+                    )}
+                    {message.role === 'assistant' && (
+                      <div className="message-avatar assistant-avatar">AI</div>
+                    )}
+                    <div className="message-bubble">
+                      <div className="message-content">
+                        {formatMessageContent(message.content)}
+                      </div>
+                      <div className="message-time">
+                        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </div>
+                    </div>
                   </div>
                 ))}
                 
                 {loading && (
-                  <div className="chat-message system">
-                    <div className="typing-indicator">
-                      <span></span>
-                      <span></span>
-                      <span></span>
+                  <div className="chat-message assistant">
+                    <div className="message-avatar assistant-avatar">AI</div>
+                    <div className="message-bubble">
+                      <div className="typing-indicator">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -172,6 +224,7 @@ function TalkToPDF() {
               
               <form className="chat-input-form" onSubmit={handleSubmit}>
                 <input
+                  ref={inputRef}
                   type="text"
                   value={question}
                   onChange={handleQuestionChange}
@@ -193,6 +246,14 @@ function TalkToPDF() {
           )}
         </div>
       </div>
+      
+      {error && (
+        <div className="error-notification">
+          <span className="error-icon">⚠️</span>
+          <span className="error-message">{error}</span>
+          <button className="error-close" onClick={() => setError(null)}>×</button>
+        </div>
+      )}
     </div>
   );
 }

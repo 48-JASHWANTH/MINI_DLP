@@ -7,6 +7,7 @@ const Dashboard = () => {
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [animationReady, setAnimationReady] = useState(false);
 
   useEffect(() => {
     const fetchAnalytics = async () => {
@@ -21,6 +22,11 @@ const Dashboard = () => {
         const response = await getAnalytics(userInfo.token);
         setAnalytics(response.data);
         setLoading(false);
+        
+        // Small delay to trigger animations after data loads
+        setTimeout(() => {
+          setAnimationReady(true);
+        }, 100);
       } catch (err) {
         console.error('Error fetching analytics:', err);
         setError('Failed to load analytics data');
@@ -62,8 +68,21 @@ const Dashboard = () => {
     }
   };
 
+  // Function to get file type icon
+  const getFileTypeIcon = (fileType) => {
+    if (!fileType) return '📄';
+    const type = fileType.toLowerCase();
+    if (type.includes('pdf')) return '📕';
+    if (type.includes('doc') || type.includes('word')) return '📘';
+    if (type.includes('xls') || type.includes('sheet')) return '📗';
+    if (type.includes('ppt') || type.includes('presentation')) return '📙';
+    if (type.includes('jpg') || type.includes('jpeg') || type.includes('png') || type.includes('image')) return '🖼️';
+    if (type.includes('txt') || type.includes('text')) return '📝';
+    return '📄';
+  };
+
   if (loading) {
-    return <LoadingAnimation message="Loading analytics..." />;
+    return <LoadingAnimation message="Loading analytics dashboard..." />;
   }
 
   if (error) {
@@ -73,6 +92,12 @@ const Dashboard = () => {
           <i className="fas fa-exclamation-triangle"></i>
         </div>
         <p>{error}</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="retry-button"
+        >
+          Try Again
+        </button>
       </div>
     );
   }
@@ -84,6 +109,12 @@ const Dashboard = () => {
           <i className="fas fa-exclamation-circle"></i>
         </div>
         <p>No analytics data available</p>
+        <button 
+          onClick={() => window.location.reload()} 
+          className="retry-button"
+        >
+          Refresh Data
+        </button>
       </div>
     );
   }
@@ -104,12 +135,17 @@ const Dashboard = () => {
   const patternLabels = Object.keys(analytics.topDetectedPatterns || {});
   const patternCounts = patternLabels.map(label => analytics.topDetectedPatterns[label]);
 
+  // Calculate animation delay for charts
+  const getAnimationDelay = (index) => {
+    return { animationDelay: `${index * 0.1}s` };
+  };
+
   return (
     <div className="dashboard-container">
       <h1 className="dashboard-title">Dashboard & Analytics</h1>
       
       <div className="dashboard-stats">
-        <div className="stat-card">
+        <div className={`stat-card ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(0)}>
           <div className="stat-icon">
             <i className="fas fa-file-alt"></i>
           </div>
@@ -119,7 +155,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className={`stat-card ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(1)}>
           <div className="stat-icon">
             <i className="fas fa-search"></i>
           </div>
@@ -129,7 +165,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className={`stat-card ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(2)}>
           <div className="stat-icon">
             <i className="fas fa-database"></i>
           </div>
@@ -139,7 +175,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="stat-card">
+        <div className={`stat-card ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(3)}>
           <div className="stat-icon">
             <i className="fas fa-file-medical-alt"></i>
           </div>
@@ -151,7 +187,7 @@ const Dashboard = () => {
       </div>
 
       <div className="dashboard-charts-container">
-        <div className="dashboard-chart">
+        <div className={`dashboard-chart ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(4)}>
           <h2>File Types Distribution</h2>
           <div className="chart-container">
             {fileTypeLabels.length > 0 ? (
@@ -161,12 +197,15 @@ const Dashboard = () => {
                     <div 
                       className="barr" 
                       style={{ 
-                        height: `${(fileTypeCounts[index] / Math.max(...fileTypeCounts)) * 100}%` 
+                        '--bar-height': `${(fileTypeCounts[index] / Math.max(...fileTypeCounts)) * 100}%`,
+                        animationDelay: `${0.3 + index * 0.1}s`
                       }}
                     >
                       <span className="bar-value">{fileTypeCounts[index]}</span>
                     </div>
-                    <span className="bar-label">{label}</span>
+                    <span className="bar-label">
+                      {getFileTypeIcon(label)} {label}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -178,7 +217,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="dashboard-chart">
+        <div className={`dashboard-chart ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(5)}>
           <h2>Documents Processed By Month</h2>
           <div className="chart-container">
             {monthLabels.length > 0 ? (
@@ -188,7 +227,8 @@ const Dashboard = () => {
                     <div 
                       className="barr" 
                       style={{ 
-                        height: `${(monthCounts[index] / Math.max(...monthCounts)) * 100}%` 
+                        '--bar-height': `${(monthCounts[index] / Math.max(...monthCounts)) * 100}%`,
+                        animationDelay: `${0.3 + index * 0.1}s`
                       }}
                     >
                       <span className="bar-value">{monthCounts[index]}</span>
@@ -208,7 +248,7 @@ const Dashboard = () => {
 
       <div className="dashboard-charts-container">
         {/* Risk Level Distribution */}
-        <div className="dashboard-chart">
+        <div className={`dashboard-chart ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(6)}>
           <h2>Risk Level Distribution</h2>
           <div className="chart-container">
             {riskLabels.length > 0 ? (
@@ -218,8 +258,9 @@ const Dashboard = () => {
                     <div 
                       className="barr" 
                       style={{ 
-                        height: `${(riskCounts[index] / Math.max(...riskCounts)) * 100}%`,
-                        background: getRiskColor(label)
+                        '--bar-height': `${(riskCounts[index] / Math.max(...riskCounts)) * 100}%`,
+                        background: getRiskColor(label),
+                        animationDelay: `${0.3 + index * 0.1}s`
                       }}
                     >
                       <span className="bar-value">{riskCounts[index]}</span>
@@ -235,8 +276,8 @@ const Dashboard = () => {
             )}
           </div>
           <div className="risk-legend">
-            {riskLabels.map(label => (
-              <div className="risk-legend-item" key={label}>
+            {riskLabels.map((label, index) => (
+              <div className="risk-legend-item" key={label} style={getAnimationDelay(index + 8)}>
                 <div className="risk-legend-color" style={{ backgroundColor: getRiskColor(label) }}></div>
                 <div className="risk-legend-label">{label}</div>
               </div>
@@ -245,7 +286,7 @@ const Dashboard = () => {
         </div>
 
         {/* Top Detected Patterns */}
-        <div className="dashboard-chart">
+        <div className={`dashboard-chart ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(7)}>
           <h2>Top Detected Patterns</h2>
           <div className="chart-container">
             {patternLabels.length > 0 ? (
@@ -255,12 +296,13 @@ const Dashboard = () => {
                     <div 
                       className="barr" 
                       style={{ 
-                        height: `${(patternCounts[index] / Math.max(...patternCounts)) * 100}%` 
+                        '--bar-height': `${(patternCounts[index] / Math.max(...patternCounts)) * 100}%`,
+                        animationDelay: `${0.3 + index * 0.1}s`
                       }}
                     >
                       <span className="bar-value">{patternCounts[index]}</span>
                     </div>
-                    <span className="bar-label">{label}</span>
+                    <span className="bar-label">{label.length > 15 ? label.substring(0, 15) + '...' : label}</span>
                   </div>
                 ))}
               </div>
@@ -273,7 +315,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="recent-files-section">
+      <div className={`recent-files-section ${animationReady ? 'animate' : ''}`} style={getAnimationDelay(8)}>
         <h2>Recent Files</h2>
         {analytics.recentFiles && analytics.recentFiles.length > 0 ? (
           <div className="recent-files-table-container">
@@ -288,8 +330,11 @@ const Dashboard = () => {
               </thead>
               <tbody>
                 {analytics.recentFiles.map((file, index) => (
-                  <tr key={index}>
-                    <td>{file.name}</td>
+                  <tr key={index} style={getAnimationDelay(index + 9)}>
+                    <td>
+                      <span className="file-icon">{getFileTypeIcon(file.type)}</span>
+                      {file.name}
+                    </td>
                     <td>{file.type}</td>
                     <td>{formatBytes(file.size)}</td>
                     <td>{formatDate(file.date)}</td>

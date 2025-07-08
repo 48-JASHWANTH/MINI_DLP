@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const routes = require('./routes');
 const app = express();
 const store = require('./store');
+const documentController = require('./controllers/documentController');
+const authMiddleware = require('./middleware/authMiddleware');
 
 // Configure CORS
 
@@ -39,7 +41,26 @@ app.use('/auth', authRouter)
 app.use('/user', userRouter)
 app.use('/user-patterns', userPatternRouter)
 
+// Add the talk-to-pdf route directly to fix 404 issue
+app.post('/api/talk-to-pdf', authMiddleware, documentController.talkToPdf);
+app.post('/talk-to-pdf', authMiddleware, documentController.talkToPdf);
+
 // Start the server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
+  
+  // Log all registered routes
+  console.log('Registered Routes:');
+  app._router.stack
+    .filter(r => r.route)
+    .map(r => {
+      console.log(`${Object.keys(r.route.methods).join(',')} ${r.route.path}`);
+    });
+  
+  console.log('API Routes:');
+  routes.stack
+    .filter(r => r.route)
+    .map(r => {
+      console.log(`${Object.keys(r.route.methods).join(',')} /api${r.route.path}`);
+    });
 });
