@@ -10,6 +10,8 @@ const { Document, Paragraph, TextRun } = docx;
 const FileModel = require("../models/fileModel");
 const UserModel = require("../models/userModel");
 const mongoose = require("mongoose");
+const { Groq } = require("groq");
+const pdfParse = require('pdf-parse');
 
 exports.checkText = async (req, res) => {
   const { text } = req.body;
@@ -868,6 +870,96 @@ exports.downloadFile = async (req, res) => {
   } catch (error) {
     console.error("[downloadFile] Error downloading file:", error);
     res.status(500).json({ error: "Error downloading file" });
+  }
+};
+
+exports.talkToPdf = async (req, res) => {
+  try {
+    const { fileId, question } = req.body;
+
+    if (!fileId || !question) {
+      return res.status(400).json({
+        success: false,
+        message: "File ID and question are required"
+      });
+    }
+
+    // Find the file in the database
+    const file = await FileModel.findById(fileId);
+    if (!file) {
+      return res.status(404).json({
+        success: false,
+        message: "File not found"
+      });
+    }
+
+    // Check if file is a PDF
+    if (file.fileType !== '.pdf') {
+      return res.status(400).json({
+        success: false,
+        message: "Selected file is not a PDF"
+      });
+    }
+
+    // Get file path
+    const filePath = path.join(__dirname, '..', file.filePath);
+
+    // Check if file exists
+    if (!fs.existsSync(filePath)) {
+      return res.status(404).json({
+        success: false,
+        message: "File not found on server"
+      });
+    }
+
+    // Read the PDF file
+    const dataBuffer = fs.readFileSync(filePath);
+    
+    // Parse PDF to extract text
+    const pdfData = await pdfParse(dataBuffer);
+    const pdfText = pdfData.text;
+
+    // Initialize Groq client with API key
+    const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
+
+    if (!process.env.GROQ_API_KEY) {
+      return res.status(500).json({
+        success: false,
+        message: "Groq API key not configured"
+      });
+    }
+
+    // Send request to Groq API
+    const completion = await groq.chat.completions.create({
+      messages: [
+        { 
+          role: "system", 
+          content: "You are a helpful AI assistant that answers questions based on the provided PDF document content. Stick to information found in the document and indicate when you don't have enough information to answer accurately." 
+        },
+        { 
+          role: "user", 
+          content: `Document content: ${pdfText}\n\nQuestion: ${question}` 
+        }
+      ],
+      model: "llama3-70b-8192",
+    });
+
+    // Get response from Groq
+    const answer = completion.choices[0].message.content;
+
+    // Return the answer to the client
+    return res.status(200).json({
+      success: true,
+      answer
+    });
+
+  } catch (error) {
+    console.error("Error in talkToPdf:", error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || "An error occurred while processing the PDF query",
+      error: process.env.NODE_ENV === 'development' ? error : undefined
+    });
   }
 };
 

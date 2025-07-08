@@ -36,6 +36,8 @@ router.delete('/patterns/:index', optionalAuth, patternController.deletePattern)
 router.post('/check-text', optionalAuth, documentController.checkText);
 router.post('/upload-file', optionalAuth, upload.single('file'), documentController.processFile);
 router.post('/save-processed-files', authMiddleware, documentController.saveProcessedFiles);
+var resi = router.post('/talk-to-pdf', authMiddleware, documentController.talkToPdf);
+console.log(resi)
 router.get('/view/:fileId', documentController.viewFile);
 router.get('/download/:fileId', documentController.downloadFile);
 router.get('/analytics', authMiddleware, documentController.getAnalytics); // Analytics requires authentication

@@ -23,7 +23,7 @@ const authRouter = require('./routes/authRouter')
 const userRouter = require('./routes/userRouter')
 const userPatternRouter = require('./routes/userPatternRouter')
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 9643;
 
 // Apply middleware
 app.use(cors(corsOptions))

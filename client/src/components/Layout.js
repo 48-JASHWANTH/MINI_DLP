@@ -8,6 +8,7 @@ import UserProfile from './UserProfile';
 import ProcessedFiles from './ProcessedFiles';
 import Dashboard from './Dashboard';
 import AboutMiniDLP from './AboutMiniDLP';
+import TalkToPDF from './TalkToPDF';
 import './Layout.css';
 
 function Layout({ setIsAuthenticated }) {
@@ -54,6 +55,10 @@ function Layout({ setIsAuthenticated }) {
   const handleAboutClick = () => {
     setActiveView('about');
   };
+  
+  const handleTalkToPdfClick = () => {
+    setActiveView('talkToPdf');
+  };
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
@@ -75,6 +80,8 @@ function Layout({ setIsAuthenticated }) {
       return <ProcessedFiles />;
     } else if (activeView === 'about') {
       return <AboutMiniDLP />;
+    } else if (activeView === 'talkToPdf') {
+      return <TalkToPDF />;
     }
     return (
       <div className="pattern-management">
@@ -97,6 +104,7 @@ function Layout({ setIsAuthenticated }) {
         onProcessedFilesClick={handleProcessedFilesClick}
         onProfileClick={handleProfileClick}
         onAboutClick={handleAboutClick}
+        onTalkToPdfClick={handleTalkToPdfClick}
         setIsAuthenticated={setIsAuthenticated}
       />
 

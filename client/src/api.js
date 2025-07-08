@@ -85,5 +85,10 @@ export const getAnalytics = (token) => apiClient.get('/api/analytics', {
   headers: { Authorization: `Bearer ${token}` }
 });
 
+export const askPdfQuestion = (token, fileId, question) => apiClient.post('/api/talk-to-pdf', 
+  { fileId, question },
+  { headers: { Authorization: `Bearer ${token}` }}
+);
+
 export const viewFile = (fileId) => `${apiClient.defaults.baseURL}/api/view/${fileId}`;
 export const downloadFile = (fileId) => `${apiClient.defaults.baseURL}/api/download/${fileId}`;
