@@ -26,7 +26,7 @@
   background-color: var(--dlp-color-bg-main);
   background-image: 
     radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.05) 0%, rgba(0, 0, 0, 0) 70%),
-    radial-gradient(circle at 85% 25%, rgba(124, 58, 237, 0.05) 0%, rgba(0, 0, 0, 0) 50%);
+                    radial-gradient(circle at 85% 25%, rgba(124, 58, 237, 0.05) 0%, rgba(0, 0, 0, 0) 50%);
   min-height: 100vh;
   color: var(--dlp-color-text-primary);
   position: relative;
@@ -346,7 +346,7 @@
   font-size: 3rem;
   color: var(--dlp-color-danger);
   margin-bottom: 1rem;
-}
+  }
 
 .dlp-dashboard__retry-button {
   background: linear-gradient(135deg, var(--dlp-color-accent-primary), var(--dlp-color-accent-secondary));
@@ -385,11 +385,11 @@
   .dlp-dashboard__stats {
     grid-template-columns: repeat(2, 1fr);
   }
-
+  
   .dlp-dashboard__charts-grid {
     grid-template-columns: 1fr;
   }
-
+  
   .dlp-dashboard__chart-container {
     height: 300px;
   }
@@ -399,7 +399,7 @@
   .dlp-dashboard__stats {
     grid-template-columns: 1fr;
   }
-
+  
   .dlp-dashboard__container {
     padding: 16px;
   }

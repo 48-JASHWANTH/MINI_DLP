@@ -233,7 +233,7 @@ function DocumentScanner() {
       {isLoading && <LoadingAnimation message="Scanning document..." />}
       <div className="scanner-card">
         <div className="scanner-header">
-          <h2 className="scanner-title"><i className="fas fa-search"></i> DOCUMENT SCANNER</h2>
+          <h2 className="scanner-title"><i className="fas fa-search"></i> Document Scanner</h2>
         </div>
         
         {error && <div className="error-message"><i className="fas fa-exclamation-circle"></i> {error}</div>}
@@ -271,7 +271,7 @@ function DocumentScanner() {
               <textarea
                 value={document}
                 onChange={(e) => setDocument(e.target.value)}
-                placeholder="Enter text"
+                placeholder="Enter text to scan for sensitive information"
                 className="scanner-textarea"
                 disabled={isLoading}
               />
@@ -280,14 +280,14 @@ function DocumentScanner() {
                 className="scan-button"
                 disabled={isLoading}
               >
-                {isLoading ? <><i className="fas fa-spinner fa-spin"></i> Scanning...</> : <><i className="fas fa-search"></i> Scan</>}
+                {isLoading ? <><i className="fas fa-spinner fa-spin"></i> Scanning...</> : <><i className="fas fa-search"></i> Scan Document</>}
               </button>
             </div>
           </div>
           
           <div className="scanner-right">
             <div className="results-section">
-              <h3 className="results-title"><i className="fas fa-clipboard-list"></i> Results</h3>
+              <h3 className="results-title"><i className="fas fa-clipboard-list"></i> Scan Results</h3>
               {results.length > 0 ? (
                 <div className="results-container">
                   {results.map((result, index) => (
@@ -311,7 +311,10 @@ function DocumentScanner() {
                   ))}
                 </div>
               ) : (
-                <div className="no-results"><i className="fas fa-info-circle"></i> No matches found.</div>
+                <div className="no-results">
+                  <i className="fas fa-info-circle"></i>
+                  <span>No sensitive information detected</span>
+                </div>
               )}
             </div>
           </div>
@@ -322,19 +325,19 @@ function DocumentScanner() {
           <>
             <div className="section-separator"></div>
             <div className="processed-files">
-              <h4><i className="fas fa-file-alt"></i> Processed Files</h4>
+              <h4><i className="fas fa-file-alt"></i> Processed Documents</h4>
               <div className="file-actions">
                 <div className="file-action-group">
-                  <h5><i className="fas fa-highlighter"></i> Highlighted File</h5>
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <h5><i className="fas fa-highlighter"></i> Highlighted Document</h5>
+                  <div className="file-action-buttons">
                     <button onClick={() => handleView(processedFiles.highlighted)}><i className="fas fa-eye"></i> View</button>
                     <button onClick={() => handleDownload(processedFiles.highlighted)}><i className="fas fa-download"></i> Download</button>
                   </div>
                 </div>
                 
                 <div className="file-action-group">
-                  <h5><i className="fas fa-mask"></i> Masked File</h5>
-                  <div style={{ display: 'flex', justifyContent: 'center' }}>
+                  <h5><i className="fas fa-mask"></i> Masked Document</h5>
+                  <div className="file-action-buttons">
                     <button onClick={() => handleView(processedFiles.masked)}><i className="fas fa-eye"></i> View</button>
                     <button onClick={() => handleDownload(processedFiles.masked)}><i className="fas fa-download"></i> Download</button>
                   </div>
